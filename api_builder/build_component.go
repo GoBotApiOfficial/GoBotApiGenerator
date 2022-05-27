@@ -34,7 +34,7 @@ func BuildComponent[Scheme interfaces.SchemeInterface](typeScheme Scheme, listEl
 				}
 			}
 		}
-		inputFiles := sub_build.BuildType(typeScheme, &builder)
+		inputFiles := sub_build.BuildType(typeScheme, &builder, listElements)
 		sub_build.BuildFiles(typeScheme, &builder, inputFiles)
 		sub_build.BuildMarshaller(typeScheme, &builder, listElements)
 		sub_build.BuildMethodName(typeScheme, &builder)

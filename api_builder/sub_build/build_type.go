@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-func BuildType[Scheme interfaces.SchemeInterface](typeScheme Scheme, builder *component.Context) []types.FieldTL {
+func BuildType[Scheme interfaces.SchemeInterface](typeScheme Scheme, builder *component.Context, listElements map[string]*types.ApiTypeTL) []types.FieldTL {
 	var filesInput []types.FieldTL
 	var structName string
 	isMethod := typeScheme.GetType() == "methods"
@@ -35,6 +35,17 @@ func BuildType[Scheme interfaces.SchemeInterface](typeScheme Scheme, builder *co
 			jsonName := field.Name
 			if field.Types[0] == "InputFile" || field.Types[0] == "InputMedia" {
 				field.Optional = false
+			}
+			_, typeName := utils.FixArray(utils.FixGeneric(false, "", field.Types, false, false))
+			if listElements[typeName] != nil {
+				if len(listElements[typeName].GetSubTypes()) > 0 {
+					field = types.FieldTL{
+						Name:     field.Name,
+						Types:    []string{"interface{}"},
+						Optional: false,
+						Default:  field.Default,
+					}
+				}
 			}
 		CheckGeneric:
 			isFieldRawImport := utils.IsRawField(field.Types)
