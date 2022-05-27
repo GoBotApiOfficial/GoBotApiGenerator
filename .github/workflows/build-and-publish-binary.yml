@@ -1,0 +1,78 @@
+
+name: Build Binaries
+on:
+  push:
+    branches: [ main ]
+    paths-ignore:
+      - '.gitignore'
+      - 'build-and-publish-binary.yml'
+      - 'CODE_OF_CONDUCT.md'
+      - 'CONTRIBUTING.md'
+      - 'LICENSE'
+      - 'README.md'
+      - '.github/*'
+
+jobs:
+  release-build:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Get Branch Name
+        run: echo "::set-output name=branch::${GITHUB_REF#refs/heads/}"
+        id: github_info
+      - name: Checkout ${{ steps.github_info.outputs.branch }}
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ steps.github_info.outputs.branch }}
+      - uses: actions/setup-go@v3
+        with:
+          go-version-file: 'go.mod'
+      - name: Build MultiArch Binaries
+        run: bash multi-arch-build.sh
+      - name: Get Package Version
+        run: |
+          VER=$(cat VERSION)
+          echo "VERSION=$VER" >> $GITHUB_ENV
+      - name: Publish Binaries
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: output/*
+          tag: "v${{ env.VERSION }}"
+          release_name: "v ${{ env.VERSION }}"
+          overwrite: true
+          file_glob: true
+
+  update-build:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Get Branch Name
+        run: echo "::set-output name=branch::${GITHUB_REF#refs/heads/}"
+        id: github_info
+      - name: Checkout ${{ steps.github_info.outputs.branch }}
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ steps.github_info.outputs.branch }}
+      - uses: actions/setup-go@v3
+        with:
+          go-version-file: 'go.mod'
+      - name: Run Compiler
+        run: |
+          go run .
+      - name: Checkout Project
+        run: |
+          bash checkout.sh
+          ls -l
+      - run: |
+          VER=$(cat VERSION)
+          echo "VERSION=$VER" >> $GITHUB_ENV
+      - name: Update Compiled GoBotAPI
+        uses: cpina/github-action-push-to-another-repository@main
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
+        with:
+          commit-message: "Update to v ${{ env.VERSION }}"
+          source-directory: './gobotapi'
+          destination-github-username: 'Laky-64'
+          destination-repository-name: 'TEST'
+          user-email: <>
+          target-branch: main
