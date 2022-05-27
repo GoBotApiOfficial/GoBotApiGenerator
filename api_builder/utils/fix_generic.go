@@ -33,6 +33,8 @@ func FixGeneric(isOptional bool, varName string, typeName []string, isMethod boo
 		return "bool"
 	case "Float", "Float number":
 		return "float64"
+	case "interface{}":
+		return "interface{}"
 	default:
 		if strings.HasPrefix(singleTypeName, "Array of ") {
 			arrays, generic := FixArray(singleTypeName)

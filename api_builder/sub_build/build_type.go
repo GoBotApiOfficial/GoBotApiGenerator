@@ -42,7 +42,7 @@ func BuildType[Scheme interfaces.SchemeInterface](typeScheme Scheme, builder *co
 					field = types.FieldTL{
 						Name:     field.Name,
 						Types:    []string{"interface{}"},
-						Optional: false,
+						Optional: field.Optional,
 						Default:  field.Default,
 					}
 				}

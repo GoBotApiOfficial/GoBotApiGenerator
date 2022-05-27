@@ -57,7 +57,7 @@ func BuildMarshaller[Scheme interfaces.SchemeInterface](typeScheme Scheme, build
 					field = types.FieldTL{
 						Name:     field.Name,
 						Types:    []string{"interface{}"},
-						Optional: false,
+						Optional: field.Optional,
 						Default:  field.Default,
 					}
 				}
