@@ -7,5 +7,6 @@ func PrettifyField(name string) string {
 	for i, x := range nameSplit {
 		nameSplit[i] = strings.ToUpper(x[:1]) + x[1:]
 	}
-	return strings.Join(nameSplit, "")
+	r := strings.NewReplacer("Id", "ID", "Url", "URL", "Ip", "IP")
+	return r.Replace(strings.Join(nameSplit, ""))
 }

@@ -10,7 +10,7 @@ func (builder *Context) AddImport(alias, packageName string) *Context {
 	if len(alias) > 0 {
 		tmpAlias = fmt.Sprintf("%s ", alias)
 	}
-	importCode := fmt.Sprintf("import %s\"%s\"", tmpAlias, packageName)
+	importCode := fmt.Sprintf("%s\"%s\"", tmpAlias, packageName)
 	if !slices.Contains(builder.imports, importCode) {
 		builder.imports = append(builder.imports, importCode)
 	}

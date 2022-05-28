@@ -10,7 +10,7 @@ on:
       - 'CONTRIBUTING.md'
       - 'LICENSE.md'
       - 'README.md'
-      - '.github/*'
+      - '.github/**'
 
 jobs:
   release-build:
