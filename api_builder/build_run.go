@@ -16,7 +16,6 @@ func (ctx *Context) BuildRun() {
 	builder.SetPackage(utils.MainPackage())
 	builder.AddImport("", fmt.Sprintf("%s/methods", consts.PackageName))
 	builder.AddImport("", fmt.Sprintf("%s/types", consts.PackageName))
-	builder.AddImport("", "fmt")
 	builder.AddImport("", "log")
 	builder.AddImport("", "time")
 	builder.AddFunc("ctx *Client", "Run", nil, "")
