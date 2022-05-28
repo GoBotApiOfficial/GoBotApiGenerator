@@ -9,6 +9,10 @@
         Examples
     </a>
     •
+    <a href="https://pkg.go.dev/github.com/Squirrel-Network/gobotapi#section-documentation">
+        Documentation
+    </a>
+    •
     <a href="https://github.com/Squirrel-Network/gobotapi">
         Sources
     </a>

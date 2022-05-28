@@ -24,6 +24,7 @@ func BuildComponent[Scheme interfaces.SchemeInterface](typeScheme Scheme, listEl
 	}
 	builder := component.NewBuilder()
 	builder.SetPackage(typeName)
+	builder.AddDocumentation(utils.FixStructName(typeScheme.GetName()), typeScheme.GetDescription())
 	if len(typeScheme.GetSubTypes()) > 0 && !typeScheme.IsSendMethod() {
 		sub_build.BuildSubtype(typeScheme, &builder, listElements)
 	} else {

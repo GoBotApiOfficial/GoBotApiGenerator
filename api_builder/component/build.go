@@ -11,5 +11,5 @@ func (builder *Context) Build() []byte {
 		packagesList = strings.Join(builder.imports, "\n")
 		packagesList += "\n\n"
 	}
-	return []byte(fmt.Sprintf("package %s\n\n%s%s", builder.packageName, packagesList, builder.content))
+	return []byte(fmt.Sprintf("package %s\n\n%s%s\n%s", builder.packageName, packagesList, builder.documentation, builder.content))
 }

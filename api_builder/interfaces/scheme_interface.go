@@ -11,4 +11,5 @@ type SchemeInterface interface {
 	GetTypeIds() *types.TypeIdsDescriptor
 	GetReturns() []string
 	IsSendMethod() bool
+	GetDescription() []string
 }

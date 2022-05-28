@@ -1,12 +1,13 @@
 package types
 
 type ApiTypeTL struct {
-	Name     string
-	Returns  []string
-	Fields   []FieldTL
-	Subtypes []string
-	TypeIds  *TypeIdsDescriptor
-	IsSend   bool
+	Name        string
+	Description []string
+	Returns     []string
+	Fields      []FieldTL
+	Subtypes    []string
+	TypeIds     *TypeIdsDescriptor
+	IsSend      bool
 }
 
 func (x *ApiTypeTL) GetFields() []FieldTL {
@@ -35,4 +36,8 @@ func (x *ApiTypeTL) IsSendMethod() bool {
 
 func (x *ApiTypeTL) GetReturns() []string {
 	return x.Returns
+}
+
+func (x *ApiTypeTL) GetDescription() []string {
+	return x.Description
 }

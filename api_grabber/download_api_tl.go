@@ -18,7 +18,6 @@ func (ctx *Context) DownloadApiTL() *types.ApiTL {
 	devRules := doc.Find("div", "id", "dev_page_content")
 	var currName string
 	var isMethod bool
-	var foundDescription string
 	var version string
 	for _, x := range devRules.Children() {
 		if x.NodeValue == "p" && len(version) == 0 {
@@ -32,7 +31,6 @@ func (ctx *Context) DownloadApiTL() *types.ApiTL {
 			isMethod = false
 		}
 		if x.NodeValue == "h4" {
-			foundDescription = ""
 			anchor := x.Find("a")
 			name := anchor.Attrs()["name"]
 			if strings.Contains(name, "-") {
@@ -45,12 +43,16 @@ func (ctx *Context) DownloadApiTL() *types.ApiTL {
 		if len(currName) == 0 {
 			continue
 		}
-		if x.NodeValue == "p" && isMethod {
+		if x.NodeValue == "p" {
 			desc := x.FullText()
-			if len(foundDescription) == 0 {
+			if isMethod && len(ctx.ApiTL.Methods[currName].Description) == 0 {
 				ctx.GetReturns(currName, desc)
 			}
-			foundDescription += desc
+			if isMethod {
+				ctx.ApiTL.Methods[currName].Description = append(ctx.ApiTL.Methods[currName].Description, desc)
+			} else {
+				ctx.ApiTL.Types[currName].Description = append(ctx.ApiTL.Types[currName].Description, desc)
+			}
 		}
 		if x.NodeValue == "table" {
 			ctx.GetFields(currName, isMethod, x)
