@@ -15,6 +15,7 @@ func (ctx *Context) Build() *Context {
 		BuildComponent(typeScheme, nil, consts)
 	}
 	ctx.BuildListeners()
+	ctx.BuildDownload(ctx.ApiTL.Types)
 	ctx.BuildRun()
 	return ctx
 }
