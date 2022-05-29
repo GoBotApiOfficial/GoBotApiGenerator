@@ -33,8 +33,13 @@ func (ctx *Context) BuildContains(listElements map[string]*types.ApiTypeTL) {
 	)
 	var filesCheck []string
 	for _, method := range ctx.ApiTL.Types["Message"].GetFields() {
-		if slices.Contains(filesInput, utils.PrettifyField(method.Name)) {
-			filesCheck = append(filesCheck, fmt.Sprintf("message.%s != nil", utils.PrettifyField(method.Name)))
+		arr, fixGeneric := utils.FixArray(method.Types[0])
+		if slices.Contains(filesInput, fixGeneric) {
+			if len(arr) > 0 {
+				filesCheck = append(filesCheck, fmt.Sprintf("len(message.%s) > 0", utils.PrettifyField(method.Name)))
+			} else {
+				filesCheck = append(filesCheck, fmt.Sprintf("message.%s != nil", utils.PrettifyField(method.Name)))
+			}
 		}
 	}
 	builder.AddReturn(strings.Join(filesCheck, fmt.Sprintf(" || \n%s\t", builder.GetTab()))).AddLine()
