@@ -16,6 +16,7 @@ func (ctx *Context) Build() *Context {
 	}
 	ctx.BuildListeners()
 	ctx.BuildDownload(ctx.ApiTL.Types)
+	ctx.BuildContains(ctx.ApiTL.Types)
 	ctx.BuildRun()
 	return ctx
 }

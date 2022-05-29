@@ -45,7 +45,7 @@ func BuildFiles[Scheme interfaces.SchemeInterface](typeScheme Scheme, builder *c
 				if isMethod {
 					if field.Name == "thumb" {
 						builder.AddImport("", fmt.Sprintf("%s/types", consts.PackageName))
-						builder.SetVarValue(fmt.Sprintf("entity.%s", prettifiedField), "types.InputURL(\"attach://thumb\")").AddLine()
+						builder.SetVarValue(fmt.Sprintf("entity.%s", prettifiedField), "types.InputPath(\"attach://thumb\")").AddLine()
 					} else {
 						builder.SetVarValue(fmt.Sprintf("entity.%s", prettifiedField), "nil").AddLine()
 					}
@@ -86,7 +86,7 @@ func BuildFiles[Scheme interfaces.SchemeInterface](typeScheme Scheme, builder *c
 			builder.AddImport("", "fmt")
 			builder.AddLine()
 			builder.AddFunc("entity "+structName, "SetAttachment", []string{"attach string"}, "")
-			builder.SetVarValue("entity.Media", "InputURL(fmt.Sprintf(\"attach://%s\", attach))").AddLine()
+			builder.SetVarValue("entity.Media", "InputPath(fmt.Sprintf(\"attach://%s\", attach))").AddLine()
 			builder.CloseBracket().AddLine()
 			var foundThumb bool
 			for _, field := range typeScheme.GetFields() {
@@ -97,7 +97,7 @@ func BuildFiles[Scheme interfaces.SchemeInterface](typeScheme Scheme, builder *c
 			}
 			if foundThumb {
 				builder.AddFunc("entity "+structName, "SetAttachmentThumb", []string{"attach string"}, "")
-				builder.SetVarValue("entity.Thumb", "InputURL(fmt.Sprintf(\"attach://%s\", attach))").AddLine()
+				builder.SetVarValue("entity.Thumb", "InputPath(fmt.Sprintf(\"attach://%s\", attach))").AddLine()
 			} else {
 				builder.AddFunc("entity "+structName, "SetAttachmentThumb", []string{"_ string"}, "")
 			}

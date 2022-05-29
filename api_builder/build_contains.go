@@ -9,9 +9,10 @@ import (
 	"golang.org/x/exp/slices"
 	"os"
 	"path"
+	"strings"
 )
 
-func (ctx *Context) BuildDownload(listElements map[string]*types.ApiTypeTL) {
+func (ctx *Context) BuildContains(listElements map[string]*types.ApiTypeTL) {
 	var filesInput []string
 	for _, typeScheme := range listElements {
 		for _, field := range typeScheme.GetFields() {
@@ -20,24 +21,24 @@ func (ctx *Context) BuildDownload(listElements map[string]*types.ApiTypeTL) {
 			}
 		}
 	}
-	outputFileFolder := path.Join(consts.OutputFolder, "download_message.go")
+	outputFileFolder := path.Join(consts.OutputFolder, "contains_files.go")
 	builder := component.NewBuilder()
 	builder.SetPackage(utils.MainPackage())
 	builder.AddImport("", fmt.Sprintf("%s/types", consts.PackageName))
 	builder.AddFunc(
-		"ctx *Client",
-		"DownloadMessage",
-		[]string{"message types.Message", "filePath string"},
-		"error",
+		"",
+		"ContainsFiles",
+		[]string{"message types.Message"},
+		"bool",
 	)
+	var filesCheck []string
 	for _, method := range ctx.ApiTL.Types["Message"].GetFields() {
 		if slices.Contains(filesInput, utils.PrettifyField(method.Name)) {
-			builder.AddIf(fmt.Sprintf("message.%s != nil", utils.PrettifyField(method.Name)))
-			builder.AddReturn(fmt.Sprintf("ctx.DownloadFile(message.%s.FileID, filePath)", utils.PrettifyField(method.Name))).AddLine()
-			builder.CloseBracket()
+			filesCheck = append(filesCheck, fmt.Sprintf("message.%s != nil", utils.PrettifyField(method.Name)))
 		}
 	}
-	builder.AddReturn("nil").AddLine()
+	fmt.Println(filesCheck)
+	builder.AddReturn(strings.Join(filesCheck, fmt.Sprintf(" || \n%s\t", builder.GetTab()))).AddLine()
 	builder.CloseBracket()
 	_ = os.WriteFile(outputFileFolder, builder.Build(), 0755)
 }
