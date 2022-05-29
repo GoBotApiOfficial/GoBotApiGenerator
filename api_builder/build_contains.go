@@ -37,7 +37,6 @@ func (ctx *Context) BuildContains(listElements map[string]*types.ApiTypeTL) {
 			filesCheck = append(filesCheck, fmt.Sprintf("message.%s != nil", utils.PrettifyField(method.Name)))
 		}
 	}
-	fmt.Println(filesCheck)
 	builder.AddReturn(strings.Join(filesCheck, fmt.Sprintf(" || \n%s\t", builder.GetTab()))).AddLine()
 	builder.CloseBracket()
 	_ = os.WriteFile(outputFileFolder, builder.Build(), 0755)
