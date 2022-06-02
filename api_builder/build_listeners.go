@@ -18,7 +18,7 @@ func (ctx *Context) BuildListeners() {
 	builder.AddFunc(
 		"ctx *Client",
 		"OnRawUpdate",
-		[]string{"handler func(update types.Update)"},
+		[]string{"handler func(client Client, update types.Update)"},
 		"",
 	)
 	builder.AddIf("ctx.handlers == nil")
