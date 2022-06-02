@@ -60,7 +60,7 @@ func (ctx *Context) BuildRun() {
 	builder.AddFor("_, update := range updates")
 	builder.SetVarValue("ctx.lastUpdateID", "int(update.UpdateID) + 1").AddLine()
 	builder.AddFor("_, x0 := range ctx.handlers[\"raw\"]")
-	builder.CallFunction("go x0.(func(types.Update))", []string{"update"}).AddLine()
+	builder.CallFunction("go x0.(func(Client, types.Update))", []string{"*ctx", "update"}).AddLine()
 	builder.CloseBracket()
 	for _, method := range update.GetFields() {
 		if method.Name != "update_id" {
@@ -68,7 +68,7 @@ func (ctx *Context) BuildRun() {
 			genericName := utils.FixGeneric(false, "", method.Types, true, false)
 			builder.AddIf(fmt.Sprintf("update.%s != nil", structName))
 			builder.AddFor(fmt.Sprintf("_, x0 := range ctx.handlers[\"%s\"]", utils.FixName(method.Name)))
-			builder.CallFunction(fmt.Sprintf("go x0.(func(%s))", genericName), []string{fmt.Sprintf("*update.%s", structName)}).AddLine()
+			builder.CallFunction(fmt.Sprintf("go x0.(func(Client, %s))", genericName), []string{"*ctx", fmt.Sprintf("*update.%s", structName)}).AddLine()
 			builder.CloseBracket().CloseBracket()
 		}
 	}

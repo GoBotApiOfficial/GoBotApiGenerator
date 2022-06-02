@@ -34,7 +34,7 @@ func (ctx *Context) BuildListeners() {
 			builder.AddFunc(
 				"ctx *Client",
 				fmt.Sprintf("On%s", structName),
-				[]string{fmt.Sprintf("handler func(update %s)", genericName)},
+				[]string{fmt.Sprintf("handler func(client Client, update %s)", genericName)},
 				"",
 			)
 			builder.AddIf("ctx.handlers == nil")
