@@ -7,6 +7,7 @@ import (
 	"BotApiCompiler/consts"
 	"bytes"
 	"embed"
+	"go/format"
 	"os"
 	"path"
 	"strings"
@@ -21,10 +22,12 @@ var version []byte
 var botApiVersion string
 
 func main() {
+	stat, _ := os.Stat("./")
+	consts.FolderPermission = stat.Mode().Perm()
 	client := api_builder.Client(api_grabber.Client().DownloadApiTL()).Build()
 	botApiVersion = client.ApiTL.Version
 	CopyRecursivePath("templates", consts.OutputFolder)
-	_ = os.WriteFile(path.Join(consts.OutputFolder, "VERSION"), version, 0755)
+	_ = os.WriteFile(path.Join(consts.OutputFolder, "VERSION"), version, consts.FolderPermission)
 }
 
 func CopyRecursivePath(src, dst string) {
@@ -40,12 +43,16 @@ func CopyRecursivePath(src, dst string) {
 
 func CopyFile(src, dst string) {
 	if _, err := os.Stat(path.Dir(dst)); os.IsNotExist(err) {
-		_ = os.MkdirAll(path.Dir(dst), 0755)
+		_ = os.MkdirAll(path.Dir(dst), consts.FolderPermission)
 	}
 	content, _ := templatesFolder.ReadFile(src)
 	content = bytes.ReplaceAll(content, []byte("%PACKAGE%"), []byte(consts.PackageName))
 	content = bytes.ReplaceAll(content, []byte("%pkg%"), []byte(utils.MainPackage()))
 	content = bytes.ReplaceAll(content, []byte("%BOT_API_VERSION%"), []byte(botApiVersion))
 	content = bytes.ReplaceAll(content, []byte("%VERSION%"), version)
-	_ = os.WriteFile(dst, content, 0755)
+	content, err := format.Source(content)
+	if err != nil {
+		panic(err)
+	}
+	_ = os.WriteFile(dst, content, consts.FolderPermission)
 }

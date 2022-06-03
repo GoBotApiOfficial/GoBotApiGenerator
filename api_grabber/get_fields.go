@@ -47,17 +47,19 @@ func (ctx *Context) GetFields(currName string, isMethod bool, x soup.Root) {
 				}
 			}
 			fields = append(fields, types.FieldTL{
-				Name:     fieldName,
-				Types:    CleanTgType(children[1].FullText()),
-				Optional: strings.HasPrefix(description, "Optional."),
-				Default:  defaultValue,
+				Name:        fieldName,
+				Types:       CleanTgType(children[1].FullText()),
+				Optional:    strings.HasPrefix(description, "Optional."),
+				Default:     defaultValue,
+				Description: description,
 			})
 		} else if isMethod && len(children) == 4 {
 			fields = append(fields, types.FieldTL{
-				Name:     children[0].FullText(),
-				Types:    CleanTgType(children[1].FullText()),
-				Optional: description != "Yes",
-				Default:  defaultValue,
+				Name:        children[0].FullText(),
+				Types:       CleanTgType(children[1].FullText()),
+				Optional:    description != "Yes",
+				Default:     defaultValue,
+				Description: description,
 			})
 		} else {
 			panic("Invalid table " + strconv.Itoa(len(children)) + " " + currName)

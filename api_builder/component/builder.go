@@ -1,5 +1,5 @@
 package component
 
-func NewBuilder() Context {
-	return Context{}
+func NewBuilder() *Context {
+	return &Context{}
 }

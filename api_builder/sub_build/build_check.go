@@ -29,7 +29,7 @@ func BuildCheck(builder *component.Context, isMethod bool, sendChildTypes map[st
 		builder.InitSwitch(fmt.Sprintf("%s.(type)", entityName))
 		var fixedCases []string
 		for _, field := range fieldTypes.Types {
-			genericName := strings.ReplaceAll(utils.FixGeneric(false, "", []string{field}, false, false), "[]", "")
+			genericName := utils.GenericType([]string{field}, false, true)
 			if isMethod {
 				builder.AddImport("", fmt.Sprintf("%s/types", consts.PackageName))
 				fixedCases = append(fixedCases, fmt.Sprintf("*types.%s", genericName))

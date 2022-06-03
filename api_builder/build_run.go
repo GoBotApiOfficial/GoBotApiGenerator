@@ -5,7 +5,6 @@ import (
 	"BotApiCompiler/api_builder/utils"
 	"BotApiCompiler/consts"
 	"fmt"
-	"os"
 	"path"
 )
 
@@ -65,7 +64,7 @@ func (ctx *Context) BuildRun() {
 	for _, method := range update.GetFields() {
 		if method.Name != "update_id" {
 			structName := utils.PrettifyField(method.Name)
-			genericName := utils.FixGeneric(false, "", method.Types, true, false)
+			genericName := utils.GenericType(method.Types, true, false)
 			builder.AddIf(fmt.Sprintf("update.%s != nil", structName))
 			builder.AddFor(fmt.Sprintf("_, x0 := range ctx.handlers[\"%s\"]", utils.FixName(method.Name)))
 			builder.CallFunction(fmt.Sprintf("go x0.(func(Client, %s))", genericName), []string{"*ctx", fmt.Sprintf("*update.%s", structName)}).AddLine()
@@ -73,5 +72,5 @@ func (ctx *Context) BuildRun() {
 		}
 	}
 	builder.CloseBracket().CloseBracket().CloseBracket()
-	_ = os.WriteFile(outputFileFolder, builder.Build(), 0755)
+	utils.WriteCode(outputFileFolder, builder.Build())
 }

@@ -7,7 +7,6 @@ import (
 	"BotApiCompiler/consts"
 	"fmt"
 	"golang.org/x/exp/slices"
-	"os"
 	"path"
 	"strings"
 )
@@ -54,5 +53,5 @@ func (ctx *Context) BuildDownload(listElements map[string]*types.ApiTypeTL) {
 	}
 	builder.AddReturn("errors.New(\"no files found\")").AddLine()
 	builder.CloseBracket()
-	_ = os.WriteFile(outputFileFolder, builder.Build(), 0755)
+	utils.WriteCode(outputFileFolder, builder.Build())
 }

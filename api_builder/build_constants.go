@@ -5,7 +5,6 @@ import (
 	"BotApiCompiler/api_builder/utils"
 	"BotApiCompiler/consts"
 	"golang.org/x/exp/slices"
-	"os"
 	"path"
 	"sort"
 	"strings"
@@ -50,6 +49,6 @@ func (ctx *Context) BuildConstants() []string {
 		}
 	}
 	builder.CloseRoundBracket()
-	_ = os.WriteFile(outputFileFolder, builder.Build(), 0755)
+	utils.WriteCode(outputFileFolder, builder.Build())
 	return constTypes
 }

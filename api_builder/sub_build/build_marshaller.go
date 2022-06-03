@@ -51,7 +51,7 @@ func BuildMarshaller[Scheme interfaces.SchemeInterface](typeScheme Scheme, build
 			if field.Types[0] == "InputFile" {
 				field.Optional = false
 			}
-			_, typeName := utils.FixArray(utils.FixGeneric(false, "", field.Types, false, false))
+			typeName := utils.GenericType(field.Types, false, true)
 			if listElements[typeName] != nil {
 				if len(listElements[typeName].GetSubTypes()) > 0 {
 					field = types.FieldTL{

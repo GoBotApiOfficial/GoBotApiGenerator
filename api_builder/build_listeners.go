@@ -5,7 +5,6 @@ import (
 	"BotApiCompiler/api_builder/utils"
 	"BotApiCompiler/consts"
 	"fmt"
-	"os"
 	"path"
 )
 
@@ -29,7 +28,7 @@ func (ctx *Context) BuildListeners() {
 	for _, method := range update.GetFields() {
 		if method.Name != "update_id" {
 			structName := utils.PrettifyField(method.Name)
-			genericName := utils.FixGeneric(false, "", method.Types, true, false)
+			genericName := utils.GenericType(method.Types, true, false)
 			listenerName := utils.FixName(method.Name)
 			builder.AddFunc(
 				"ctx *Client",
@@ -48,5 +47,5 @@ func (ctx *Context) BuildListeners() {
 			builder.CloseBracket().AddLine()
 		}
 	}
-	_ = os.WriteFile(outputFileFolder, builder.Build(), 0755)
+	utils.WriteCode(outputFileFolder, builder.Build())
 }

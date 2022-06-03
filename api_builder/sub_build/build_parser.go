@@ -19,7 +19,7 @@ func BuildParser[Scheme interfaces.SchemeInterface](typeScheme Scheme, builder *
 		} else {
 			constName = returns[0]
 		}
-		returnName := utils.FixGeneric(false, "", []string{constName}, true, false)
+		returnName := utils.GenericType([]string{constName}, true, false)
 		constName = utils.FixConstName(constName)
 		if len(returns) > 1 && !slices.Contains(returns, "Boolean") {
 			panic(fmt.Sprintf("Method %s returns more than one value", typeScheme.GetName()))

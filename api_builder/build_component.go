@@ -8,7 +8,6 @@ import (
 	"BotApiCompiler/api_grabber/types"
 	"BotApiCompiler/consts"
 	"fmt"
-	"os"
 	"path"
 	"strings"
 )
@@ -26,7 +25,7 @@ func BuildComponent[Scheme interfaces.SchemeInterface](typeScheme Scheme, listEl
 	builder.SetPackage(typeName)
 	builder.AddDocumentation(utils.FixStructName(typeScheme.GetName()), typeScheme.GetDescription())
 	if len(typeScheme.GetSubTypes()) > 0 && !typeScheme.IsSendMethod() {
-		sub_build.BuildSubtype(typeScheme, &builder, listElements)
+		sub_build.BuildSubtype(typeScheme, builder, listElements)
 	} else {
 		for _, field := range listElements {
 			for _, fieldType := range field.GetSubTypes() {
@@ -35,13 +34,13 @@ func BuildComponent[Scheme interfaces.SchemeInterface](typeScheme Scheme, listEl
 				}
 			}
 		}
-		inputFiles := sub_build.BuildType(typeScheme, &builder, listElements)
-		sub_build.BuildFiles(typeScheme, &builder, inputFiles)
-		sub_build.BuildMarshaller(typeScheme, &builder, listElements)
-		sub_build.BuildMethodName(typeScheme, &builder)
-		sub_build.BuildParser(typeScheme, &builder, listConsts)
+		inputFiles := sub_build.BuildType(typeScheme, builder, listElements)
+		sub_build.BuildFiles(typeScheme, builder, inputFiles)
+		sub_build.BuildMarshaller(typeScheme, builder, listElements)
+		sub_build.BuildMethodName(typeScheme, builder)
+		sub_build.BuildParser(typeScheme, builder, listConsts)
 	}
 	if builder.HaveBody() {
-		_ = os.WriteFile(outputFileFolder, builder.Build(), 0755)
+		utils.WriteCode(outputFileFolder, builder.Build())
 	}
 }
