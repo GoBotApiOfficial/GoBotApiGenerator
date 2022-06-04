@@ -18,6 +18,7 @@ func InitializeFolders() {
 		"types/raw",
 		"methods",
 		"filters",
+		"utils",
 	}
 	for _, folder := range folders {
 		if _, err := os.Stat(path.Join(consts.OutputFolder, folder)); os.IsNotExist(err) {

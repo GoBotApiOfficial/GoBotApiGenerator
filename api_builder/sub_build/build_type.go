@@ -37,7 +37,7 @@ func BuildType[Scheme interfaces.SchemeInterface](typeScheme Scheme, builder *co
 				field.Optional = false
 			}
 			typeName := utils.GenericType(field.Types, false, false)
-			if listElements[typeName] != nil {
+			if listElements[typeName] != nil && !(len(listElements[typeName].GetSubTypes()) > 0 && !listElements[typeName].IsSendMethod()) {
 				if len(listElements[typeName].GetSubTypes()) > 0 {
 					field = types.FieldTL{
 						Name:     field.Name,

@@ -60,7 +60,7 @@ func (ctx *Context) BuildFilters() {
 	slices.Sort(sharedCallable)
 	slices.Sort(sharedFieldsList)
 
-	outputFileFolder := path.Join(path.Join(consts.OutputFolder, "filters"), "filterable.go")
+	outputFileFolder := path.Join(consts.OutputFolder, "filters", "filterable.go")
 	builder := component.NewBuilder()
 	builder.SetPackage("filters")
 	builder.AddImport("", fmt.Sprintf("%s/types", consts.PackageName))
@@ -69,7 +69,7 @@ func (ctx *Context) BuildFilters() {
 	builder.CloseBracket()
 	utils.WriteCode(outputFileFolder, builder.Build())
 
-	outputFileFolder = path.Join(path.Join(consts.OutputFolder, "filters"), "filterable_data.go")
+	outputFileFolder = path.Join(consts.OutputFolder, "filters", "filterable_data.go")
 	builder = component.NewBuilder()
 	builder.SetPackage("filters")
 	builder.AddImport("", fmt.Sprintf("%s/types", consts.PackageName))

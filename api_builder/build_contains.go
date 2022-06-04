@@ -20,9 +20,9 @@ func (ctx *Context) BuildContains(listElements map[string]*types.ApiTypeTL) {
 			}
 		}
 	}
-	outputFileFolder := path.Join(consts.OutputFolder, "contains_files.go")
+	outputFileFolder := path.Join(consts.OutputFolder, "utils", "contains_files.go")
 	builder := component.NewBuilder()
-	builder.SetPackage(utils.MainPackage())
+	builder.SetPackage("utils")
 	builder.AddImport("", fmt.Sprintf("%s/types", consts.PackageName))
 	builder.AddFunc(
 		"",
@@ -41,7 +41,7 @@ func (ctx *Context) BuildContains(listElements map[string]*types.ApiTypeTL) {
 			}
 		}
 	}
-	builder.AddReturn(strings.Join(filesCheck, fmt.Sprintf(" || \n%s\t", builder.GetTab()))).AddLine()
+	builder.AddReturn(strings.Join(filesCheck, " || \n")).AddLine()
 	builder.CloseBracket()
 	utils.WriteCode(outputFileFolder, builder.Build())
 }
