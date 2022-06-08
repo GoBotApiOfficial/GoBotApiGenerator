@@ -17,11 +17,11 @@ func (ctx *Context) BuildListeners() {
 	builder.AddFunc(
 		"ctx *Client",
 		"OnRawUpdate",
-		[]string{"handler func(client Client, update types.Update)"},
+		[]string{"handler func(client *Client, update types.Update)"},
 		"",
 	)
 	builder.AddIf("ctx.handlers == nil")
-	builder.SetVarValue("ctx.handlers", "make(map[string][]interface{})").AddLine()
+	builder.SetVarValue("ctx.handlers", "make(map[string][]any)").AddLine()
 	builder.CloseBracket()
 	builder.SetVarValue("ctx.handlers[\"raw\"]", "append(ctx.handlers[\"raw\"], handler)").AddLine()
 	builder.CloseBracket().AddLine()
@@ -33,11 +33,11 @@ func (ctx *Context) BuildListeners() {
 			builder.AddFunc(
 				"ctx *Client",
 				fmt.Sprintf("On%s", structName),
-				[]string{fmt.Sprintf("handler func(client Client, update %s)", genericName)},
+				[]string{fmt.Sprintf("handler func(client *Client, update %s)", genericName)},
 				"",
 			)
 			builder.AddIf("ctx.handlers == nil")
-			builder.SetVarValue("ctx.handlers", "make(map[string][]interface{})").AddLine()
+			builder.SetVarValue("ctx.handlers", "make(map[string][]any)").AddLine()
 			builder.CloseBracket()
 			builder.SetVarValue(
 				fmt.Sprintf("ctx.handlers[\"%s\"]", listenerName),

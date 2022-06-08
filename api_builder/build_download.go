@@ -24,11 +24,12 @@ func (ctx *Context) BuildDownload(listElements map[string]*types.ApiTypeTL) {
 	builder := component.NewBuilder()
 	builder.SetPackage(utils.MainPackage())
 	builder.AddImport("", fmt.Sprintf("%s/types", consts.PackageName))
+	builder.AddImport("rawTypes", fmt.Sprintf("%s/types/raw", consts.PackageName))
 	builder.AddImport("", "errors")
 	builder.AddFunc(
 		"ctx *Client",
 		"DownloadMedia",
-		[]string{"message types.Message, filePath string"},
+		[]string{"message types.Message", "filePath string", "progress rawTypes.ProgressCallable"},
 		"error",
 	)
 	for _, method := range ctx.ApiTL.Types["Message"].GetFields() {
@@ -42,11 +43,11 @@ func (ctx *Context) BuildDownload(listElements map[string]*types.ApiTypeTL) {
 				builder.AddIf("file.Width > bestQuality.Width")
 				builder.SetVarValue("bestQuality", "file").AddLine()
 				builder.CloseBracket().CloseBracket()
-				builder.AddReturn("ctx.DownloadFile(bestQuality.FileID, filePath)").AddLine()
+				builder.AddReturn("ctx.DownloadFile(bestQuality.FileID, filePath, progress)").AddLine()
 				builder.CloseBracket()
 			} else {
 				builder.AddIf(fmt.Sprintf("message.%s != nil", utils.PrettifyField(method.Name)))
-				builder.AddReturn(fmt.Sprintf("ctx.DownloadFile(message.%s.FileID, filePath)", utils.PrettifyField(method.Name))).AddLine()
+				builder.AddReturn(fmt.Sprintf("ctx.DownloadFile(message.%s.FileID, filePath, progress)", utils.PrettifyField(method.Name))).AddLine()
 				builder.CloseBracket()
 			}
 		}

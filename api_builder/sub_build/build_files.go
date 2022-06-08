@@ -17,6 +17,17 @@ func BuildFiles[Scheme interfaces.SchemeInterface](typeScheme Scheme, builder *c
 	structName = "*" + structName
 	if (len(filesInput) > 0 && isMethod) || isMediaInput {
 		builder.AddLine()
+		if isMethod {
+			builder.AddFunc(
+				fmt.Sprintf("entity %s", structName),
+				"ProgressCallable",
+				nil,
+				"rawTypes.ProgressCallable",
+			)
+			builder.AddReturn("entity.Progress").AddLine()
+			builder.CloseBracket()
+		}
+		builder.AddLine()
 		builder.AddFunc(
 			fmt.Sprintf("entity %s", structName),
 			"Files",
@@ -33,9 +44,9 @@ func BuildFiles[Scheme interfaces.SchemeInterface](typeScheme Scheme, builder *c
 				builder.InitSwitch(fmt.Sprintf("entity.%s.(type)", prettifiedField))
 				if isMethod {
 					builder.AddImport("", fmt.Sprintf("%s/types", consts.PackageName))
-					builder.AddCase(false, []string{"types.InputFile"})
+					builder.AddCase(false, []string{"types.InputBytes"})
 				} else {
-					builder.AddCase(false, []string{"InputFile"})
+					builder.AddCase(false, []string{"InputBytes"})
 				}
 				if field.Name == "media" {
 					builder.SetVarValue(fmt.Sprintf("files[\"%s\"]", typeFieldName), "entity.Media").AddLine()
@@ -45,7 +56,7 @@ func BuildFiles[Scheme interfaces.SchemeInterface](typeScheme Scheme, builder *c
 				if isMethod {
 					if field.Name == "thumb" {
 						builder.AddImport("", fmt.Sprintf("%s/types", consts.PackageName))
-						builder.SetVarValue(fmt.Sprintf("entity.%s", prettifiedField), "types.InputPath(\"attach://thumb\")").AddLine()
+						builder.SetVarValue(fmt.Sprintf("entity.%s", prettifiedField), "types.InputURL(\"attach://thumb\")").AddLine()
 					} else {
 						builder.SetVarValue(fmt.Sprintf("entity.%s", prettifiedField), "nil").AddLine()
 					}
@@ -86,7 +97,7 @@ func BuildFiles[Scheme interfaces.SchemeInterface](typeScheme Scheme, builder *c
 			builder.AddImport("", "fmt")
 			builder.AddLine()
 			builder.AddFunc("entity "+structName, "SetAttachment", []string{"attach string"}, "")
-			builder.SetVarValue("entity.Media", "InputPath(fmt.Sprintf(\"attach://%s\", attach))").AddLine()
+			builder.SetVarValue("entity.Media", "InputURL(fmt.Sprintf(\"attach://%s\", attach))").AddLine()
 			builder.CloseBracket().AddLine()
 			var foundThumb bool
 			for _, field := range typeScheme.GetFields() {
@@ -97,15 +108,24 @@ func BuildFiles[Scheme interfaces.SchemeInterface](typeScheme Scheme, builder *c
 			}
 			if foundThumb {
 				builder.AddFunc("entity "+structName, "SetAttachmentThumb", []string{"attach string"}, "")
-				builder.SetVarValue("entity.Thumb", "InputPath(fmt.Sprintf(\"attach://%s\", attach))").AddLine()
+				builder.SetVarValue("entity.Thumb", "InputURL(fmt.Sprintf(\"attach://%s\", attach))").AddLine()
 			} else {
 				builder.AddFunc("entity "+structName, "SetAttachmentThumb", []string{"_ string"}, "")
 			}
 			builder.CloseBracket()
 		}
 	} else if isMethod {
-		builder.AddLine()
 		builder.AddImport("rawTypes", fmt.Sprintf("%s/types/raw", consts.PackageName))
+		builder.AddLine()
+		builder.AddFunc(
+			fmt.Sprintf("entity %s", structName),
+			"ProgressCallable",
+			nil,
+			"rawTypes.ProgressCallable",
+		)
+		builder.AddReturn("nil").AddLine()
+		builder.CloseBracket()
+		builder.AddLine()
 		builder.AddFunc("entity "+structName, "Files", nil, "map[string]rawTypes.InputFile")
 		builder.AddReturn("map[string]rawTypes.InputFile{}").AddLine()
 		builder.CloseBracket()

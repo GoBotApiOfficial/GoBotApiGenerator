@@ -22,7 +22,7 @@ func BuildCheck(builder *component.Context, isMethod bool, sendChildTypes map[st
 		originalEntityName := entityName
 		if fieldTypes.Optional {
 			builder.AddIf(fmt.Sprintf("%s != nil", entityName))
-			if !strings.Contains(genericNameTmp, "interface") {
+			if !strings.Contains(genericNameTmp, "any") {
 				entityName = fmt.Sprintf("(*%s)", entityName)
 			}
 		}

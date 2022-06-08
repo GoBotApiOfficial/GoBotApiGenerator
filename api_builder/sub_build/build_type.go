@@ -18,7 +18,7 @@ func BuildType[Scheme interfaces.SchemeInterface](typeScheme Scheme, builder *co
 	structName = utils.FixStructName(typeScheme.GetName())
 	if len(typeScheme.GetFields()) == 0 {
 		if !isMethod {
-			builder.AddType(utils.FixStructName(structName), "interface{}").AddLine()
+			builder.AddType(utils.FixStructName(structName), "any").AddLine()
 		} else {
 			builder.AddType(utils.FixStructName(structName), "struct{}").AddLine()
 		}
@@ -41,7 +41,7 @@ func BuildType[Scheme interfaces.SchemeInterface](typeScheme Scheme, builder *co
 				if len(listElements[typeName].GetSubTypes()) > 0 {
 					field = types.FieldTL{
 						Name:     field.Name,
-						Types:    []string{"interface{}"},
+						Types:    []string{"any"},
 						Optional: field.Optional,
 						Default:  field.Default,
 					}
@@ -90,6 +90,10 @@ func BuildType[Scheme interfaces.SchemeInterface](typeScheme Scheme, builder *co
 				genericName,
 				jsonName,
 			)
+		}
+		if len(filesInput) > 0 && isMethod {
+			builder.AddImport("rawTypes", fmt.Sprintf("%s/types/raw", consts.PackageName))
+			builder.AddField("Progress", "rawTypes.ProgressCallable", "-")
 		}
 		builder.CloseBracket()
 	}

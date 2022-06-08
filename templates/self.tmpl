@@ -1,0 +1,7 @@
+package %pkg%
+
+import "%PACKAGE%/types"
+
+func (ctx *Client) Self() types.User {
+	return *ctx.me
+}

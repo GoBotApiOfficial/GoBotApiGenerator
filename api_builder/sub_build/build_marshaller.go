@@ -27,7 +27,7 @@ func BuildMarshaller[Scheme interfaces.SchemeInterface](typeScheme Scheme, build
 			} else if genericCheck.IsSendMethod() && len(genericCheck.GetFields()) == 0 && genericName != "InputFile" {
 				sendChildTypes[field.Name] = field
 			}
-		} else if genericName == "interface{}" {
+		} else if genericName == "any" {
 			sendChildTypes[field.Name] = field
 		}
 		if len(field.Default) > 0 {
@@ -56,7 +56,7 @@ func BuildMarshaller[Scheme interfaces.SchemeInterface](typeScheme Scheme, build
 				if len(listElements[typeName].GetSubTypes()) > 0 {
 					field = types.FieldTL{
 						Name:     field.Name,
-						Types:    []string{"interface{}"},
+						Types:    []string{"any"},
 						Optional: field.Optional,
 						Default:  field.Default,
 					}

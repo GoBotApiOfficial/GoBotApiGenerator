@@ -14,7 +14,7 @@ func FixGeneric(isOptional bool, varName string, typeName []string, isMethod boo
 	}
 	if len(typeName) > 1 && !(strings.Contains(varName, "id") || slices.Contains(typeName, "InputFile")) {
 		arrays, _ := FixArray(singleTypeName)
-		interfaceName := "interface{}"
+		interfaceName := "any"
 		if varName == "media" && isMethod {
 			interfaceName = "types.InputMedia"
 		}
@@ -33,8 +33,8 @@ func FixGeneric(isOptional bool, varName string, typeName []string, isMethod boo
 		return "bool"
 	case "Float", "Float number":
 		return "float64"
-	case "interface{}":
-		return "interface{}"
+	case "any":
+		return "any"
 	default:
 		if strings.HasPrefix(singleTypeName, "Array of ") {
 			arrays, generic := FixArray(singleTypeName)
