@@ -18,6 +18,6 @@ func (ctx *Context) Build() *Context {
 	ctx.BuildDownload(ctx.ApiTL.Types)
 	ctx.BuildContains(ctx.ApiTL.Types)
 	ctx.BuildFilters()
-	ctx.BuildRun()
+	ctx.BuildHandleUpdate()
 	return ctx
 }

@@ -2,8 +2,8 @@ package filters
 
 import "%PACKAGE%"
 
-func Filter[T Filterable](callable func(*gobotapi.Client, T), operands FilterOperand) func(*gobotapi.Client, T) {
-	return func(client *gobotapi.Client, update T) {
+func Filter[T Filterable](callable func(*%pkg%.Client, T), operands FilterOperand) func(*%pkg%.Client, T) {
+	return func(client *%pkg%.Client, update T) {
 		if operands(filterableData(update)) {
 			callable(client, update)
 		}

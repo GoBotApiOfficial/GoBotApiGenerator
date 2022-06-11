@@ -26,7 +26,7 @@ func (ctx *Client) Invoke(method rawTypes.Method) (*rawTypes.Result, error) {
 		"POST",
 		form,
 		files,
-        method.ProgressCallable(),
+		method.ProgressCallable(),
 	)
 	return utils.ParseResult(rawResult, err, method)
 }

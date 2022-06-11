@@ -15,7 +15,7 @@ func (ctx *Context) BuildListeners() {
 	update := ctx.ApiTL.Types["Update"]
 	builder.AddImport("", fmt.Sprintf("%s/types", consts.PackageName))
 	builder.AddFunc(
-		"ctx *Client",
+		"ctx *BasicClient",
 		"OnRawUpdate",
 		[]string{"handler func(client *Client, update types.Update)"},
 		"",
@@ -31,7 +31,7 @@ func (ctx *Context) BuildListeners() {
 			genericName := utils.GenericType(method.Types, true, false)
 			listenerName := utils.FixName(method.Name)
 			builder.AddFunc(
-				"ctx *Client",
+				"ctx *BasicClient",
 				fmt.Sprintf("On%s", structName),
 				[]string{fmt.Sprintf("handler func(client *Client, update %s)", genericName)},
 				"",
