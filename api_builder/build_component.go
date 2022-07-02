@@ -9,15 +9,14 @@ import (
 	"BotApiCompiler/consts"
 	"fmt"
 	"path"
-	"strings"
 )
 
 func BuildComponent[Scheme interfaces.SchemeInterface](typeScheme Scheme, listElements map[string]*types.ApiTypeTL, listConsts []string) {
 	typeName := typeScheme.GetType()
-	isMethod := strings.Contains(typeName, "methods")
 	var outputFileFolder string
-	if isMethod {
-		outputFileFolder = path.Join(consts.OutputFolder, typeName, fmt.Sprintf("%s.go", utils.FixName(typeScheme.GetName())))
+	if typeScheme.GetName() == "ResponseParameters" {
+		outputFileFolder = path.Join(consts.OutputFolder, typeName, "raw", fmt.Sprintf("%s.go", utils.FixName(typeScheme.GetName())))
+		typeName = "raw"
 	} else {
 		outputFileFolder = path.Join(consts.OutputFolder, typeName, fmt.Sprintf("%s.go", utils.FixName(typeScheme.GetName())))
 	}

@@ -39,6 +39,7 @@ func (ctx *Context) BuildConstants() []string {
 			}
 		}
 	}
+	constTypes = append(constTypes, "ErrorMessage")
 	sort.Strings(constTypes)
 	for i, field := range constTypes {
 		fieldPrettified := utils.FixConstName(field)
