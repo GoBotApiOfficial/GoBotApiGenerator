@@ -21,7 +21,11 @@ func (ctx *Context) BuildHandleUpdate() {
 	builder.FillField("me", "user")
 	builder.CloseBracket()
 	builder.AddFor("_, x0 := range ctx.handlers[\"raw\"]")
-	builder.CallFunction("go x0.(func(*Client, types.Update))", []string{"client", "update"}).AddLine()
+	builder.CallFunction("ctx.concurrencyManager.Wait", nil).AddLine()
+	builder.InitGoFunc([]string{"x any"})
+	builder.CallFunction("x.(func(*Client, types.Update))", []string{"client", "update"}).AddLine()
+	builder.CallFunction("ctx.concurrencyManager.Done", nil).AddLine()
+	builder.CloseGoFunc([]string{"x0"})
 	builder.CloseBracket()
 	for _, method := range update.GetFields() {
 		if method.Name != "update_id" {
@@ -29,7 +33,11 @@ func (ctx *Context) BuildHandleUpdate() {
 			genericName := utils.GenericType(method.Types, true, false)
 			builder.AddIf(fmt.Sprintf("update.%s != nil", structName))
 			builder.AddFor(fmt.Sprintf("_, x0 := range ctx.handlers[\"%s\"]", utils.FixName(method.Name)))
-			builder.CallFunction(fmt.Sprintf("go x0.(func(*Client, %s))", genericName), []string{"client", fmt.Sprintf("*update.%s", structName)}).AddLine()
+			builder.CallFunction("ctx.concurrencyManager.Wait", nil).AddLine()
+			builder.InitGoFunc([]string{"x any"})
+			builder.CallFunction(fmt.Sprintf("x.(func(*Client, %s))", genericName), []string{"client", fmt.Sprintf("*update.%s", structName)}).AddLine()
+			builder.CallFunction("ctx.concurrencyManager.Done", nil).AddLine()
+			builder.CloseGoFunc([]string{"x0"})
 			builder.CloseBracket().CloseBracket()
 		}
 	}

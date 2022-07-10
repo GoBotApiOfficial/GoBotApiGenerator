@@ -74,10 +74,10 @@ func BuildFiles[Scheme interfaces.SchemeInterface](typeScheme Scheme, builder *c
 				builder.DeclareVar("attachName", "string").AddLine()
 				builder.AddIf("k == \"thumb\"")
 				builder.SetVarValue("attachName", "fmt.Sprintf(\"file-%d-thumb\", i)").AddLine()
-				builder.CallFunction("x0.SetAttachmentThumb", []string{fmt.Sprintf("attachName")}).AddLine()
+				builder.CallFunction("x0.SetAttachmentThumb", []string{"attachName"}).AddLine()
 				builder.AddElse()
 				builder.SetVarValue("attachName", "fmt.Sprintf(\"file-%d\", i)").AddLine()
-				builder.CallFunction("x0.SetAttachment", []string{fmt.Sprintf("attachName")}).AddLine()
+				builder.CallFunction("x0.SetAttachment", []string{"attachName"}).AddLine()
 				builder.CloseBracket()
 				builder.SetVarValue("files[attachName]", "v").AddLine()
 				builder.CloseBracket().CloseBracket()
@@ -88,6 +88,11 @@ func BuildFiles[Scheme interfaces.SchemeInterface](typeScheme Scheme, builder *c
 				}
 				builder.AddFor(fmt.Sprintf("k, v := range entity.%s.Files()", tmpField))
 				builder.SetVarValue("files[k]", "v").AddLine()
+				builder.AddIf("k == \"thumb\"")
+				builder.CallFunction("entity.Media.SetAttachmentThumb", []string{"k"}).AddLine()
+				builder.AddElse()
+				builder.CallFunction("entity.Media.SetAttachment", []string{"k"}).AddLine()
+				builder.CloseBracket()
 				builder.CloseBracket()
 			}
 		}
