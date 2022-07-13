@@ -23,8 +23,8 @@ func (ctx *Context) BuildHandleUpdate() {
 	builder.AddFor("_, x0 := range ctx.handlers[\"raw\"]")
 	builder.CallFunction("ctx.concurrencyManager.Wait", nil).AddLine()
 	builder.InitGoFunc([]string{"x any"})
+	builder.CallFunction("defer ctx.concurrencyManager.Done", nil).AddLine()
 	builder.CallFunction("x.(func(*Client, types.Update))", []string{"client", "update"}).AddLine()
-	builder.CallFunction("ctx.concurrencyManager.Done", nil).AddLine()
 	builder.CloseGoFunc([]string{"x0"})
 	builder.CloseBracket()
 	for _, method := range update.GetFields() {
@@ -35,8 +35,8 @@ func (ctx *Context) BuildHandleUpdate() {
 			builder.AddFor(fmt.Sprintf("_, x0 := range ctx.handlers[\"%s\"]", utils.FixName(method.Name)))
 			builder.CallFunction("ctx.concurrencyManager.Wait", nil).AddLine()
 			builder.InitGoFunc([]string{"x any"})
+			builder.CallFunction("defer ctx.concurrencyManager.Done", nil).AddLine()
 			builder.CallFunction(fmt.Sprintf("x.(func(*Client, %s))", genericName), []string{"client", fmt.Sprintf("*update.%s", structName)}).AddLine()
-			builder.CallFunction("ctx.concurrencyManager.Done", nil).AddLine()
 			builder.CloseGoFunc([]string{"x0"})
 			builder.CloseBracket().CloseBracket()
 		}
