@@ -91,6 +91,9 @@ func (ctx *Context) BuildFilters() {
 				builder.SetVarValue(field.Name, contentField).AddLine()
 			}
 		}
+		if typeName == "types.Message" {
+			builder.SetVarValue("message", "&x").AddLine()
+		}
 		builder.AddBreak()
 		builder.CloseCase()
 	}
