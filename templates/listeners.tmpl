@@ -5,6 +5,7 @@ import (
 	"%PACKAGE%/types"
     "regexp"
 	"strings"
+	"sync"
 )
 
 func (ctx *BasicClient) OnCommand(command string, aliasList []string, handler func(client *Client, update types.Message)) {
