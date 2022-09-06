@@ -19,6 +19,8 @@ func FixGeneric(isOptional bool, varName string, typeName []string, isMethod boo
 			interfaceName = "types.InputMedia"
 		}
 		return fmt.Sprintf("%s%s", arrays, interfaceName)
+	} else if varName == "chat_id" && slices.Contains(typeName, "Integer") && slices.Contains(typeName, "String") {
+		return "any"
 	}
 	switch singleTypeName {
 	case "Integer":

@@ -6,6 +6,7 @@ import (
 	"BotApiCompiler/api_grabber/types"
 	"BotApiCompiler/consts"
 	"fmt"
+	"golang.org/x/exp/slices"
 	"strings"
 )
 
@@ -20,7 +21,8 @@ func BuildCheck(builder *component.Context, isMethod bool, sendChildTypes map[st
 			entityName = fmt.Sprintf("x%d", i)
 		}
 		originalEntityName := entityName
-		if fieldTypes.Optional {
+		isChatIDWithUsername := fieldTypes.Name == "chat_id" && slices.Contains(fieldTypes.Types, "Integer") && slices.Contains(fieldTypes.Types, "String")
+		if fieldTypes.Optional || isChatIDWithUsername {
 			builder.AddIf(fmt.Sprintf("%s != nil", entityName))
 			if !strings.Contains(genericNameTmp, "any") {
 				entityName = fmt.Sprintf("(*%s)", entityName)
@@ -32,7 +34,14 @@ func BuildCheck(builder *component.Context, isMethod bool, sendChildTypes map[st
 			genericName := utils.GenericType([]string{field}, false, true)
 			if isMethod {
 				builder.AddImport("", fmt.Sprintf("%s/types", consts.PackageName))
-				fixedCases = append(fixedCases, fmt.Sprintf("*types.%s", genericName))
+				if utils.IsSimpleGeneric([]string{genericName}) {
+					fixedCases = append(fixedCases, genericName)
+					if genericName == "int" {
+						fixedCases = append(fixedCases, "int64")
+					}
+				} else {
+					fixedCases = append(fixedCases, fmt.Sprintf("*types.%s", genericName))
+				}
 			} else {
 				fixedCases = append(fixedCases, genericName)
 			}
@@ -45,7 +54,7 @@ func BuildCheck(builder *component.Context, isMethod bool, sendChildTypes map[st
 		for i := 0; i < arrayCounts; i++ {
 			builder.CloseBracket()
 		}
-		if fieldTypes.Optional {
+		if fieldTypes.Optional || isChatIDWithUsername {
 			builder.CloseBracket()
 		}
 		builder.CloseBracket()
