@@ -25,7 +25,7 @@ func (ctx *Context) BuildFilters() {
 		if !utils.IsSimpleGeneric(typeScheme.Types) {
 			for _, field := range ctx.ApiTL.Types[genericName].GetFields() {
 				if slices.Contains(consts.CommonFields, field.Name) {
-					tmpGeneric := fmt.Sprintf("*%s", utils.GenericType(field.Types, true, false))
+					tmpGeneric := fmt.Sprintf("*%s", utils.GenericTypeWithName(field.Types, field.Name, true, false))
 					if !slices.Contains(foundPackages, genericAddName) {
 						foundPackages = append(foundPackages, genericAddName)
 					}
@@ -69,14 +69,27 @@ func (ctx *Context) BuildFilters() {
 	builder.CloseBracket()
 	utils.WriteCode(outputFileFolder, builder.Build())
 
+	outputFileFolder = path.Join(consts.OutputFolder, "filters", "type.go")
+	builder = component.NewBuilder()
+	builder.SetPackage("filters")
+	builder.AddImport("", fmt.Sprintf("%s", consts.PackageName))
+	builder.AddImport("", fmt.Sprintf("%s/types", consts.PackageName))
+	builder.InitStruct("DataFilter")
+	for _, typeName := range sharedFields {
+		builder.AddField(typeName.Name, typeName.Type, "")
+	}
+	builder.AddField("Client", "*gobotapi.Client", "")
+	builder.AddField("RawUpdate", "any", "")
+	builder.CloseBracket()
+	utils.WriteCode(outputFileFolder, builder.Build())
+
 	outputFileFolder = path.Join(consts.OutputFolder, "filters", "filterable_data.go")
 	builder = component.NewBuilder()
 	builder.SetPackage("filters")
+	builder.AddImport("", fmt.Sprintf("%s", consts.PackageName))
 	builder.AddImport("", fmt.Sprintf("%s/types", consts.PackageName))
-	builder.AddFunc("", "filterableData", []string{"filterable any"}, fmt.Sprintf("(%s)", strings.Join(sharedTypes, ", ")))
-	for _, typeName := range sharedFields {
-		builder.DeclareVar(typeName.Name, typeName.Type).AddLine()
-	}
+	builder.AddFunc("", "filterableData", []string{"client *gobotapi.Client", "filterable any"}, fmt.Sprintf("(%s)", "*DataFilter"))
+	builder.InitVarValue("dataResult", "&DataFilter{}").AddLine()
 	builder.InitSwitch("filterable.(type)")
 	for _, typeName := range foundPackages {
 		builder.AddCase(false, []string{typeName})
@@ -88,24 +101,14 @@ func (ctx *Context) BuildFilters() {
 				if !field.Optional {
 					contentField = fmt.Sprintf("&%s", contentField)
 				}
-				builder.SetVarValue(field.Name, contentField).AddLine()
+				builder.SetVarValue(fmt.Sprintf("dataResult.%s", utils.FixStructName(field.Name)), contentField).AddLine()
 			}
 		}
-		if typeName == "types.Message" {
-			builder.SetVarValue("message", "&x").AddLine()
-		}
-		builder.AddBreak()
-		builder.CloseCase()
 	}
 	builder.CloseBracket()
-	sort.Slice(sharedFields, func(i, j int) bool {
-		return sharedFields[i].Type < sharedFields[j].Type
-	})
-	var sharedFieldsListStr []string
-	for _, field := range sharedFields {
-		sharedFieldsListStr = append(sharedFieldsListStr, field.Name)
-	}
-	builder.AddReturn(strings.Join(sharedFieldsListStr, ", "))
+	builder.SetVarValue("dataResult.Client", "client").AddLine()
+	builder.SetVarValue("dataResult.RawUpdate", "filterable").AddLine()
+	builder.AddReturn("dataResult")
 	builder.CloseBracket()
 	utils.WriteCode(outputFileFolder, builder.Build())
 }

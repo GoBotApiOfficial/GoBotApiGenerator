@@ -12,4 +12,5 @@ var CommonFields = []string{
 	"from",
 	"chat",
 	"message",
+	"date",
 }
