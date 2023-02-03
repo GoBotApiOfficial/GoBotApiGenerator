@@ -26,6 +26,7 @@ func main() {
 	consts.FolderPermission = stat.Mode().Perm()
 	client := api_builder.Client(api_grabber.Client().DownloadApiTL()).Build()
 	botApiVersion = client.ApiTL.Version
+	version = []byte(strings.ReplaceAll(string(version), "\n", ""))
 	CopyRecursivePath("templates", consts.OutputFolder)
 	_ = os.WriteFile(path.Join(consts.OutputFolder, "VERSION"), version, consts.FolderPermission)
 }
