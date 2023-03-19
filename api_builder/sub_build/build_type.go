@@ -49,7 +49,7 @@ func BuildType[Scheme interfaces.SchemeInterface](typeScheme Scheme, builder *co
 			}
 		CheckGeneric:
 			isFieldRawImport := utils.IsRawField(field.Types)
-			if isFieldRawImport && isMethod {
+			if isFieldRawImport {
 				builder.AddImport("rawTypes", fmt.Sprintf("%s/types/raw", consts.PackageName))
 			} else if !utils.IsSimpleGeneric(field.Types) && isMethod {
 				builder.AddImport("", fmt.Sprintf("%s/types", consts.PackageName))
