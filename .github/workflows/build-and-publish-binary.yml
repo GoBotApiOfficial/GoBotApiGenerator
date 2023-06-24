@@ -2,7 +2,7 @@
 name: Build Binaries
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
     paths-ignore:
       - '.gitignore'
       - 'build-and-publish-binary.yml'
@@ -80,4 +80,4 @@ jobs:
           user-name: 'GoBotApiOfficial'
           destination-repository-name: 'gobotapi'
           user-email: <>
-          target-branch: master
+          target-branch: main
