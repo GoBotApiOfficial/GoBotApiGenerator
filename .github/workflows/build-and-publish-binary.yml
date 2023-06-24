@@ -11,6 +11,8 @@ on:
       - 'LICENSE.md'
       - 'README.md'
       - '.github/**'
+permissions:
+  contents: write
 
 jobs:
   release-build:
@@ -67,15 +69,15 @@ jobs:
       - run: |
           VER=$(cat VERSION)
           echo "VERSION=$VER" >> $GITHUB_ENV
-      - name: Update Compiled GoBotAPI
+      - name: Update Compiled GoBotApiOfficial
         uses: cpina/github-action-push-to-another-repository@v1.4.2
         env:
           API_TOKEN_GITHUB: "${{ secrets.API_TOKEN_GITHUB }}"
         with:
           commit-message: ${{ github.event.head_commit.message }}
           source-directory: './gobotapi'
-          destination-github-username: 'GoBotApi'
-          user-name: 'Laky-64'
+          destination-github-username: 'GoBotApiOfficial'
+          user-name: 'GoBotApiOfficial'
           destination-repository-name: 'gobotapi'
           user-email: <>
           target-branch: master

@@ -1,6 +1,6 @@
 #!/bin/bash
 shopt -s dotglob
-git clone https://github.com/Squirrel-Network/gobotapi.git botapi
+git clone https://github.com/GoBotApiOfficial/gobotapi.git botapi
 # shellcheck disable=SC2164
 cd botapi/
 for filename in *; do
