@@ -96,11 +96,11 @@ starting point for this project, also thanks to [@empijei] for help about the pr
 [@LucaTheHacker] for optimizations.
 
 Just because the thanks aren't enough...
-Huge thanks to [@MikiMleam] for the cool logo and to [@BluLupo] for helping to fix some stuff.
+Huge thanks to [@MikiMleam] for the cool logo.
 
 [@Laky-64]: https://github.com/Laky-64
 [@geiccobs]: https://github.com/geiccobs
 [@empijei]: https://github.com/empijei
 [@LucaTheHacker]: https://github.com/LucaTheHacker
-[@BluLupo]: https://github.com/BluLupo
+[@FallitoDelCazzo]: https://github.com/-
 [@MikiMleam]: https://t.me/MikiMleam
