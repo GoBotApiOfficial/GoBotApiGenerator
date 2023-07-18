@@ -13,7 +13,8 @@ on:
       - '.github/**'
 permissions:
   contents: write
-
+env:
+  GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 jobs:
   release-build:
     runs-on: ubuntu-20.04
