@@ -64,6 +64,8 @@ jobs:
           go get golang.org/x/exp
           go run .
       - name: Checkout Project
+        env:
+          GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           bash checkout.sh
           ls -l
