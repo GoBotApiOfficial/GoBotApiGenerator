@@ -65,7 +65,7 @@ jobs:
           go run .
       - name: Checkout Project
         env:
-          GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PToken: ${{ secrets.PToken }}
         run: |
           bash checkout.sh
           ls -l
