@@ -22,7 +22,7 @@ func NewClient(token string) *PollingClient {
 	}
 }
 
-func NewWebhook(hostname string, port int) *WebhookClient {
+func NewWebhook(hostname string, port int, isLocalWebhookServer bool) *WebhookClient {
 	return &WebhookClient{
 		BasicClient: &BasicClient{
 			AntiFloodData:  make(map[int64]*rawTypes.AntiFloodData),
@@ -35,6 +35,7 @@ func NewWebhook(hostname string, port int) *WebhookClient {
 			Config: ServerConfig{
 				HostName: hostname,
 				Port:     port,
+				IsLocalWebHookServer: isLocalWebhookServer,
 			},
 		},
 	}
