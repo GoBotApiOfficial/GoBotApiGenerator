@@ -5,7 +5,6 @@ import (
 	"BotApiCompiler/api_builder/interfaces"
 	"BotApiCompiler/api_builder/utils"
 	"BotApiCompiler/api_grabber/types"
-	"fmt"
 	"sort"
 )
 
@@ -49,12 +48,13 @@ func BuildSubtype[Scheme interfaces.SchemeInterface](typeScheme Scheme, builder 
 		)
 	}
 	builder.CloseBracket().AddLine()
-	builder.AddFunc(fmt.Sprintf("x %s", typeScheme.GetName()), "Kind", nil, "int")
+	/*builder.AddFunc(fmt.Sprintf("x %s", typeScheme.GetName()), "Kind", nil, "int")
+	fmt.Println(typeScheme.GetTypeIds().CommonName)
 	builder.InitSwitch(fmt.Sprintf("x.%s", utils.PrettifyField(typeScheme.GetTypeIds().CommonName)))
 	for _, field := range typeScheme.GetSubTypes() {
 		builder.AddCase(true, listElements[field].TypeIds.TypeIds)
 		builder.AddReturn(fmt.Sprintf("Type%s", field)).CloseCase().AddLine()
 	}
 	builder.AddDefault().AddReturn("-1").CloseCase().AddLine()
-	builder.CloseBracket().CloseBracket()
+	builder.CloseBracket().CloseBracket()*/
 }
