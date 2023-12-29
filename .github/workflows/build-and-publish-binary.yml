@@ -60,8 +60,7 @@ jobs:
           go-version-file: 'go.mod'
       - name: Run Compiler
         run: |
-          go get github.com/anaskhan96/soup
-          go get golang.org/x/exp
+          go mod tidy
           go run .
       - name: Checkout Project
         env:
