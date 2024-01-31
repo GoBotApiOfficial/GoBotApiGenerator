@@ -2,7 +2,7 @@
 name: Build Binaries
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
     paths-ignore:
       - '.gitignore'
       - 'build-and-publish-binary.yml'
@@ -13,7 +13,8 @@ on:
       - '.github/**'
 permissions:
   contents: write
-
+env:
+  GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 jobs:
   release-build:
     runs-on: ubuntu-20.04
@@ -59,10 +60,11 @@ jobs:
           go-version-file: 'go.mod'
       - name: Run Compiler
         run: |
-          go get github.com/anaskhan96/soup
-          go get golang.org/x/exp
+          go mod tidy
           go run .
       - name: Checkout Project
+        env:
+          PToken: ${{ secrets.PToken }}
         run: |
           bash checkout.sh
           ls -l
@@ -80,4 +82,4 @@ jobs:
           user-name: 'GoBotApiOfficial'
           destination-repository-name: 'gobotapi'
           user-email: <>
-          target-branch: master
+          target-branch: main
