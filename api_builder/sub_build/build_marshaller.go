@@ -14,15 +14,24 @@ func BuildMarshaller[Scheme interfaces.SchemeInterface](typeScheme Scheme, build
 	isMethod := typeScheme.GetType() == "methods"
 	foundDefaults := false
 	for _, field := range typeScheme.GetFields() {
-		genericName := strings.ReplaceAll(utils.FixGeneric(false, field.Name, field.Types, false, false), "[]", "")
+		fixedGeneric := utils.FixGeneric(false, field.Name, field.Types, false, false)
+		genericName := strings.ReplaceAll(fixedGeneric, "[]", "")
 		if listElements[genericName] != nil {
 			genericCheck := listElements[genericName]
 			if len(genericCheck.GetSubTypes()) > 0 && genericCheck.IsSendMethod() {
+				genericsCheckTmp := []string{fixedGeneric}
+				var fullTypes []string
+				if strings.Count(fixedGeneric, "[]") == 0 {
+					genericsCheckTmp = genericCheck.GetSubTypes()
+				} else {
+					fullTypes = genericCheck.GetSubTypes()
+				}
 				sendChildTypes[field.Name] = types.FieldTL{
-					Name:     field.Name,
-					Types:    genericCheck.GetSubTypes(),
-					Optional: field.Optional,
-					Default:  field.Default,
+					Name:      field.Name,
+					Types:     genericsCheckTmp,
+					FullTypes: fullTypes,
+					Optional:  field.Optional,
+					Default:   field.Default,
 				}
 			} else if genericCheck.IsSendMethod() && len(genericCheck.GetFields()) == 0 && genericName != "InputFile" {
 				sendChildTypes[field.Name] = field

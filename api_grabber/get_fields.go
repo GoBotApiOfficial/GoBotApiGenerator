@@ -15,6 +15,7 @@ func (ctx *Context) GetFields(currName string, isMethod bool, x soup.Root) {
 	rgx2, _ := regexp.Compile("“(.*?)”")
 	rgx3, _ := regexp.Compile(", always “(.*?)”")
 	rgx4, _ := regexp.Compile("Type of the result, must be (.*)")
+	rgx5, _ := regexp.Compile("Always (.*?)\\.")
 	for _, tr := range body.FindAll("tr") {
 		children := tr.FindAll("td")
 		description := children[2].FullText()
@@ -37,6 +38,9 @@ func (ctx *Context) GetFields(currName string, isMethod bool, x soup.Root) {
 					typeIdsReturn = append(typeIdsReturn, y...)
 				} else if strings.Contains(description, ", always ") {
 					typeIdentifier := rgx3.FindStringSubmatch(description)[1]
+					typeIdsReturn = append(typeIdsReturn, typeIdentifier)
+				} else if strings.HasPrefix(description, "Always ") {
+					typeIdentifier := rgx5.FindStringSubmatch(description)[1]
 					typeIdsReturn = append(typeIdsReturn, typeIdentifier)
 				}
 				if len(typeIdsReturn) > 0 {

@@ -23,12 +23,20 @@ func BuildComponent[Scheme interfaces.SchemeInterface](typeScheme Scheme, listEl
 	builder := component.NewBuilder()
 	builder.SetPackage(typeName)
 	builder.AddDocumentation(utils.FixStructName(typeScheme.GetName()), typeScheme.GetDescription())
-	if len(typeScheme.GetSubTypes()) > 0 && !typeScheme.IsSendMethod() {
+	if len(typeScheme.GetSubTypes()) > 0 && !typeScheme.IsSendMethod() && typeScheme.GetTypeIds() != nil {
+		for _, field := range typeScheme.GetSubTypes() {
+			if listElements[field].TypeIds == nil {
+				builder.AddType(utils.FixStructName(typeScheme.GetName()), listElements[field].GetName()).AddLine()
+				utils.WriteCode(outputFileFolder, builder.Build())
+				return
+			}
+		}
 		sub_build.BuildSubtype(typeScheme, builder, listElements)
 	} else {
 		for _, field := range listElements {
 			for _, fieldType := range field.GetSubTypes() {
-				if typeScheme.GetName() == fieldType && len(field.GetSubTypes()) > 0 && !field.IsSendMethod() {
+				if typeScheme.GetName() == fieldType && len(field.GetSubTypes()) > 0 &&
+					!field.IsSendMethod() && typeScheme.GetTypeIds() != nil {
 					return
 				}
 			}
@@ -38,6 +46,7 @@ func BuildComponent[Scheme interfaces.SchemeInterface](typeScheme Scheme, listEl
 		sub_build.BuildMarshaller(typeScheme, builder, listElements)
 		sub_build.BuildMethodName(typeScheme, builder)
 		sub_build.BuildParser(typeScheme, builder, listConsts)
+		sub_build.BuildSubtypeV2(typeScheme, builder, listElements)
 	}
 	if builder.HaveBody() {
 		utils.WriteCode(outputFileFolder, builder.Build())

@@ -14,15 +14,21 @@ func (ctx *Context) BuildConstants() []string {
 	outputFileFolder := path.Join(consts.OutputFolder, "types", "kinds.go")
 	builder := component.NewBuilder()
 	builder.SetPackage("types")
+	var existingConstants []string
 	for _, typeScheme := range ctx.ApiTL.Types {
 		if len(typeScheme.GetSubTypes()) > 0 && !typeScheme.IsSendMethod() {
 			builder.AddComment(strings.ToUpper(utils.FixName(typeScheme.GetName())))
 			builder.InitConst()
-			for i, field := range typeScheme.GetSubTypes() {
-				if i > 0 {
-					builder.AddConstValue("Type"+field, "")
-				} else {
-					builder.AddConstValue("Type"+field, "iota")
+			addedNum := 0
+			for _, field := range typeScheme.GetSubTypes() {
+				if !slices.Contains(existingConstants, field) {
+					existingConstants = append(existingConstants, field)
+					if addedNum > 0 {
+						builder.AddConstValue("Type"+field, "")
+					} else {
+						builder.AddConstValue("Type"+field, "iota")
+					}
+					addedNum++
 				}
 			}
 			builder.CloseRoundBracket()
@@ -41,12 +47,16 @@ func (ctx *Context) BuildConstants() []string {
 	}
 	constTypes = append(constTypes, "ErrorMessage")
 	sort.Strings(constTypes)
-	for i, field := range constTypes {
+	addedNum := 0
+	for _, field := range constTypes {
 		fieldPrettified := utils.FixConstName(field)
-		if i == 0 {
-			builder.AddConstValue("Type"+fieldPrettified, "iota")
-		} else {
-			builder.AddConstValue("Type"+fieldPrettified, "")
+		if !slices.Contains(existingConstants, fieldPrettified) {
+			if addedNum == 0 {
+				builder.AddConstValue("Type"+fieldPrettified, "iota")
+			} else {
+				builder.AddConstValue("Type"+fieldPrettified, "")
+			}
+			addedNum++
 		}
 	}
 	builder.CloseRoundBracket()

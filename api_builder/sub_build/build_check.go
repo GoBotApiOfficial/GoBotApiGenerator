@@ -24,13 +24,19 @@ func BuildCheck(builder *component.Context, isMethod bool, sendChildTypes map[st
 		isChatIDWithUsername := fieldTypes.Name == "chat_id" && slices.Contains(fieldTypes.Types, "Integer") && slices.Contains(fieldTypes.Types, "String")
 		if fieldTypes.Optional || isChatIDWithUsername {
 			builder.AddIf(fmt.Sprintf("%s != nil", entityName))
-			if !strings.Contains(genericNameTmp, "any") {
+			if !strings.Contains(genericNameTmp, "any") && len(fieldTypes.FullTypes) == 0 {
 				entityName = fmt.Sprintf("(*%s)", entityName)
 			}
 		}
 		builder.InitSwitch(fmt.Sprintf("%s.(type)", entityName))
 		var fixedCases []string
-		for _, field := range fieldTypes.Types {
+		var listTypes []string
+		if len(fieldTypes.FullTypes) > 0 {
+			listTypes = fieldTypes.FullTypes
+		} else {
+			listTypes = fieldTypes.Types
+		}
+		for _, field := range listTypes {
 			genericName := utils.GenericType([]string{field}, false, true)
 			if isMethod {
 				builder.AddImport("", fmt.Sprintf("%s/types", consts.PackageName))
