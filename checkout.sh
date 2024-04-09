@@ -1,8 +1,7 @@
 #!/bin/bash
-export PToken
 shopt -s dotglob
 
-git clone https://gobotapiofficial:$PToken@github.com/GoBotApiOfficial/gobotapi.git botapi
+git clone -j12 https://github.com/GoBotApiOfficial/gobotapi botapi
 # shellcheck disable=SC2164
 cd botapi/
 for filename in *; do

@@ -72,7 +72,7 @@ jobs:
           VER=$(cat VERSION)
           echo "VERSION=$VER" >> $GITHUB_ENV
       - name: Update Compiled GoBotApiOfficial
-        uses: cpina/github-action-push-to-another-repository@v1.4.2
+        uses: cpina/github-action-push-to-another-repository@v1.7.2
         env:
           API_TOKEN_GITHUB: "${{ secrets.API_TOKEN_GITHUB }}"
         with:
