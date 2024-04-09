@@ -5,6 +5,9 @@ import (
 )
 
 func (builder *Context) AddDocumentation(name string, documentation []string) *Context {
+	if len(documentation) == 0 {
+		return builder
+	}
 	documentation[0] = name + " " + documentation[0]
 	var description []string
 	for _, sentence := range documentation {
