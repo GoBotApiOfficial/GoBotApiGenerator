@@ -8,14 +8,12 @@ import (
 
 func (ctx *Context) GetReturns(methodName, description string) {
 	retSearch, _ := regexp.Compile("(?i)(?:on success,|returns)([^.]*)(?:on success)?")
-	retSearch2, _ := regexp.Compile("(?i)([^.]*)(is returned)")
-	matches := retSearch.FindStringSubmatch(description)
-	matches2 := retSearch2.FindStringSubmatch(description)
+	matches := retSearch.FindAllStringSubmatch(description, -1)
 	var retTypes []string
 	if len(matches) > 0 {
-		retTypes = GetReturnTypes(strings.TrimSpace(matches[1]))
-	} else if len(matches2) > 0 {
-		retTypes = GetReturnTypes(strings.TrimSpace(matches2[1]))
+		size := len(matches) - 1
+		sizeSub := len(matches[size]) - 1
+		retTypes = GetReturnTypes(strings.TrimSpace(matches[size][sizeSub]))
 	} else {
 		panic(fmt.Sprintf("No return found for %s", methodName))
 	}
