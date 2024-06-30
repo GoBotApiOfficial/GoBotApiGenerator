@@ -8,7 +8,7 @@ func GetProperType(t string) string {
 		return "Float"
 	case "Int":
 		return "Integer"
-	case "True", "Bool":
+	case "True", "Bool", "False":
 		return "Boolean"
 	default:
 		return t
