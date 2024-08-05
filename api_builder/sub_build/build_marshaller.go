@@ -5,6 +5,7 @@ import (
 	"BotApiCompiler/api_builder/interfaces"
 	"BotApiCompiler/api_builder/utils"
 	"BotApiCompiler/api_grabber/types"
+	"BotApiCompiler/consts"
 	"fmt"
 	"strings"
 )
@@ -43,6 +44,11 @@ func BuildMarshaller[Scheme interfaces.SchemeInterface](typeScheme Scheme, build
 			foundDefaults = true
 		}
 	}
+
+	if consts.MediaInputRgx.MatchString(typeScheme.GetName()) {
+		foundDefaults = true
+	}
+
 	if foundDefaults {
 		builder.AddLine()
 		parentStructName := utils.FixStructName(typeScheme.GetName())

@@ -35,7 +35,7 @@ func BuildType[Scheme interfaces.SchemeInterface](typeScheme Scheme, builder *co
 		builder.InitStruct(structName)
 		for _, field := range typesOrdered {
 			jsonName := field.Name
-			if field.Types[0] == "InputFile" || field.Types[0] == "InputMedia" {
+			if field.Types[0] == "InputFile" || consts.GenericInputRgx.MatchString(field.Types[0]) {
 				field.Optional = false
 			}
 			typeName := utils.GenericType(field.Types, false, false)

@@ -7,12 +7,14 @@ import (
 	"BotApiCompiler/api_grabber/types"
 	"BotApiCompiler/consts"
 	"fmt"
+	"regexp"
 	"strings"
 )
 
 func BuildFiles[Scheme interfaces.SchemeInterface](typeScheme Scheme, builder *component.Context, filesInput []types.FieldTL) {
 	isMethod := typeScheme.GetType() == "methods"
-	isMediaInput := strings.HasPrefix(typeScheme.GetName(), "InputMedia") && typeScheme.GetName() != "InputMedia"
+	isMediaInput := consts.MediaInputRgx.MatchString(typeScheme.GetName())
+	mediaFieldRgx := regexp.MustCompile("^\\[].*\\.Input.*Media$")
 	structName := utils.FixStructName(typeScheme.GetName())
 	structName = "*" + structName
 	if consts.GenericInputRgx.MatchString(typeScheme.GetName()) {
@@ -44,7 +46,8 @@ func BuildFiles[Scheme interfaces.SchemeInterface](typeScheme Scheme, builder *c
 		for _, field := range filesInput {
 			genericName := utils.FixGeneric(field.Optional, field.Name, field.Types, isMethod, true)
 			prettifiedField := utils.PrettifyField(field.Name)
-			typeFieldName := strings.ToLower(strings.TrimPrefix(typeScheme.GetName(), "InputMedia"))
+			typeFieldName := strings.ToLower(consts.InputTypeNameRgx.FindAllStringSubmatch(typeScheme.GetName(), -1)[0][2])
+
 			if strings.Contains(genericName, "InputFile") {
 				builder.InitSwitch(fmt.Sprintf("entity.%s.(type)", prettifiedField))
 				if isMethod {
@@ -68,11 +71,11 @@ func BuildFiles[Scheme interfaces.SchemeInterface](typeScheme Scheme, builder *c
 				}
 				builder.CloseCase().CloseBracket()
 			} else if genericName == "string" {
-				typeFieldName := strings.ToLower(strings.TrimPrefix(typeScheme.GetName(), "InputMedia"))
+				typeFieldName = strings.ToLower(consts.InputTypeNameRgx.FindAllStringSubmatch(typeScheme.GetName(), -1)[0][2])
 				builder.AddIf(fmt.Sprintf("entity.%s == \"\"", prettifiedField))
 				builder.SetVarValue(fmt.Sprintf("files[\"%s\"]", typeFieldName), "entity.Media").AddLine()
 				builder.CloseBracket()
-			} else if genericName == "[]types.InputMedia" {
+			} else if mediaFieldRgx.MatchString(genericName) {
 				builder.AddFor(fmt.Sprintf("i, x0 := range entity.%s", prettifiedField))
 				builder.InitVarValue("x1", "x0.(rawTypes.InputMediaFiles).Files()").AddLine()
 				builder.AddFor("k, v := range x1")

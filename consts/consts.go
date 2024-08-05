@@ -21,4 +21,6 @@ var (
 		"date",
 	}
 	GenericInputRgx  = regexp.MustCompile("^Input.*Media$")
+	MediaInputRgx    = regexp.MustCompile("^Input.*Media\\w+")
+	InputTypeNameRgx = regexp.MustCompile("^(Input.*Media|)(.*?)$")
 )
