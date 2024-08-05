@@ -14,7 +14,7 @@ func (ctx *Context) GetFields(currName string, isMethod bool, x soup.Root) {
 	rgx1, _ := regexp.Compile("must be (.*)")
 	rgx2, _ := regexp.Compile("“(.*?)”")
 	rgx3, _ := regexp.Compile(", always “(.*?)”")
-	rgx4, _ := regexp.Compile("Type of the result, must be (.*)")
+	rgx4, _ := regexp.Compile("Type of the \\w+, must be (.*)")
 	rgx5, _ := regexp.Compile("Always (.*?)\\.")
 	for _, tr := range body.FindAll("tr") {
 		children := tr.FindAll("td")
@@ -22,32 +22,27 @@ func (ctx *Context) GetFields(currName string, isMethod bool, x soup.Root) {
 		defaultValue := ""
 		if !isMethod && len(children) == 3 {
 			fieldName := children[0].FullText()
-			if !isMethod {
-				var typeIdsReturn []string
-				if strings.Contains(description, "Type of the result, must be ") {
-					defaultValue = rgx4.FindStringSubmatch(description)[1]
-				} else if strings.Contains(description, ", must be ") {
-					typeIdentifier := rgx1.FindStringSubmatch(description)[1]
-					typeIdsReturn = append(typeIdsReturn, typeIdentifier)
-				} else if strings.Contains(description, ", one of “") {
-					typeIdentifier := rgx2.FindAllStringSubmatch(description, -1)
-					var y []string
-					for _, t := range typeIdentifier {
-						y = append(y, t[1])
-					}
-					typeIdsReturn = append(typeIdsReturn, y...)
-				} else if strings.Contains(description, ", always ") {
-					typeIdentifier := rgx3.FindStringSubmatch(description)[1]
-					typeIdsReturn = append(typeIdsReturn, typeIdentifier)
-				} else if strings.HasPrefix(description, "Always ") {
-					typeIdentifier := rgx5.FindStringSubmatch(description)[1]
-					typeIdsReturn = append(typeIdsReturn, typeIdentifier)
+			var typeIdsReturn []string
+			if res := rgx4.FindStringSubmatch(description); len(res) > 0 {
+				defaultValue = res[1]
+			} else if typeIdentifier := rgx1.FindStringSubmatch(description); len(typeIdentifier) > 0 {
+				typeIdsReturn = append(typeIdsReturn, typeIdentifier[1])
+			} else if strings.Contains(description, ", one of “") {
+				typeIdentifier := rgx2.FindAllStringSubmatch(description, -1)
+				var y []string
+				for _, t := range typeIdentifier {
+					y = append(y, t[1])
 				}
-				if len(typeIdsReturn) > 0 {
-					ctx.ApiTL.Types[currName].TypeIds = &types.TypeIdsDescriptor{
-						CommonName: fieldName,
-						TypeIds:    typeIdsReturn,
-					}
+				typeIdsReturn = append(typeIdsReturn, y...)
+			} else if typeIdentifier := rgx3.FindStringSubmatch(description); len(typeIdentifier) > 0 {
+				typeIdsReturn = append(typeIdsReturn, typeIdentifier[1])
+			} else if typeIdentifier := rgx5.FindStringSubmatch(description); len(typeIdentifier) > 0 {
+				typeIdsReturn = append(typeIdsReturn, typeIdentifier[1])
+			}
+			if len(typeIdsReturn) > 0 {
+				ctx.ApiTL.Types[currName].TypeIds = &types.TypeIdsDescriptor{
+					CommonName: fieldName,
+					TypeIds:    typeIdsReturn,
 				}
 			}
 			fields = append(fields, types.FieldTL{
