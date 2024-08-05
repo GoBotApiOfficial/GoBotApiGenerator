@@ -18,7 +18,9 @@ func BuildType[Scheme interfaces.SchemeInterface](typeScheme Scheme, builder *co
 	structName = utils.FixStructName(typeScheme.GetName())
 	if len(typeScheme.GetFields()) == 0 {
 		if !isMethod {
-			builder.AddType(utils.FixStructName(structName), "any").AddLine()
+			if !consts.GenericInputRgx.MatchString(typeScheme.GetName()) {
+				builder.AddType(utils.FixStructName(structName), "any").AddLine()
+			}
 		} else {
 			builder.AddType(utils.FixStructName(structName), "struct{}").AddLine()
 		}

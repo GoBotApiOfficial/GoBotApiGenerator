@@ -15,7 +15,12 @@ func BuildFiles[Scheme interfaces.SchemeInterface](typeScheme Scheme, builder *c
 	isMediaInput := strings.HasPrefix(typeScheme.GetName(), "InputMedia") && typeScheme.GetName() != "InputMedia"
 	structName := utils.FixStructName(typeScheme.GetName())
 	structName = "*" + structName
-	if (len(filesInput) > 0 && isMethod) || isMediaInput {
+	if consts.GenericInputRgx.MatchString(typeScheme.GetName()) {
+		builder.InitInterface(typeScheme.GetName())
+		builder.AddInterfaceFunc("SetAttachment", []string{"string"}, "")
+		builder.AddInterfaceFunc("SetAttachmentThumb", []string{"string"}, "")
+		builder.CloseBracket()
+	} else if (len(filesInput) > 0 && isMethod) || isMediaInput {
 		builder.AddLine()
 		if isMethod {
 			builder.AddFunc(

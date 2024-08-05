@@ -20,4 +20,5 @@ var (
 		"message",
 		"date",
 	}
+	GenericInputRgx  = regexp.MustCompile("^Input.*Media$")
 )
