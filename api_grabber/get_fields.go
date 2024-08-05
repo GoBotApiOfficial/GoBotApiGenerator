@@ -11,11 +11,11 @@ import (
 func (ctx *Context) GetFields(currName string, isMethod bool, x soup.Root) {
 	body := x.Find("tbody")
 	var fields []types.FieldTL
-	rgx1, _ := regexp.Compile("must be (.*)")
+	rgx1, _ := regexp.Compile(",must be (.*)")
 	rgx2, _ := regexp.Compile("“(.*?)”")
 	rgx3, _ := regexp.Compile(", always “(.*?)”")
 	rgx4, _ := regexp.Compile("Type of the \\w+, must be (.*)")
-	rgx5, _ := regexp.Compile("Always (.*?)\\.")
+	rgx5, _ := regexp.Compile("^Always (.*?)\\.")
 	for _, tr := range body.FindAll("tr") {
 		children := tr.FindAll("td")
 		description := children[2].FullText()
@@ -25,8 +25,8 @@ func (ctx *Context) GetFields(currName string, isMethod bool, x soup.Root) {
 			var typeIdsReturn []string
 			if res := rgx4.FindStringSubmatch(description); len(res) > 0 {
 				defaultValue = res[1]
-			} else if typeIdentifier := rgx1.FindStringSubmatch(description); len(typeIdentifier) > 0 {
-				typeIdsReturn = append(typeIdsReturn, typeIdentifier[1])
+			} else if res = rgx1.FindStringSubmatch(description); len(res) > 1 {
+				typeIdsReturn = append(typeIdsReturn, res[1])
 			} else if strings.Contains(description, ", one of “") {
 				typeIdentifier := rgx2.FindAllStringSubmatch(description, -1)
 				var y []string
@@ -34,10 +34,10 @@ func (ctx *Context) GetFields(currName string, isMethod bool, x soup.Root) {
 					y = append(y, t[1])
 				}
 				typeIdsReturn = append(typeIdsReturn, y...)
-			} else if typeIdentifier := rgx3.FindStringSubmatch(description); len(typeIdentifier) > 0 {
-				typeIdsReturn = append(typeIdsReturn, typeIdentifier[1])
-			} else if typeIdentifier := rgx5.FindStringSubmatch(description); len(typeIdentifier) > 0 {
-				typeIdsReturn = append(typeIdsReturn, typeIdentifier[1])
+			} else if res = rgx3.FindStringSubmatch(description); len(res) > 1 {
+				typeIdsReturn = append(typeIdsReturn, res[1])
+			} else if res = rgx5.FindStringSubmatch(description); len(res) > 1 {
+				typeIdsReturn = append(typeIdsReturn, res[1])
 			}
 			if len(typeIdsReturn) > 0 {
 				ctx.ApiTL.Types[currName].TypeIds = &types.TypeIdsDescriptor{
