@@ -12,11 +12,15 @@ import (
 
 func BuildMarshaller[Scheme interfaces.SchemeInterface](typeScheme Scheme, builder *component.Context, listElements map[string]*types.ApiTypeTL) {
 	sendChildTypes := make(map[string]types.FieldTL)
+	var nullableTypes []string
 	isMethod := typeScheme.GetType() == "methods"
 	foundDefaults := false
 	for _, field := range typeScheme.GetFields() {
 		fixedGeneric := utils.FixGeneric(false, field.Name, field.Types, false, false)
 		genericName := strings.ReplaceAll(fixedGeneric, "[]", "")
+		if !consts.BasicTypesRgx.MatchString(fixedGeneric) && field.Optional {
+			nullableTypes = append(nullableTypes, field.Name)
+		}
 		if listElements[genericName] != nil {
 			genericCheck := listElements[genericName]
 			if len(genericCheck.GetSubTypes()) > 0 && genericCheck.IsSendMethod() {
@@ -124,7 +128,8 @@ func BuildMarshaller[Scheme interfaces.SchemeInterface](typeScheme Scheme, build
 		}
 		builder.AddReturn("json.Marshal(alias)").AddLine()
 		builder.CloseBracket()
-	} else if len(sendChildTypes) > 0 {
+	} else if len(sendChildTypes) > 0 || len(nullableTypes) > 0 && typeScheme.IsSendMethod() && isMethod {
+		builder.AddImport("", "reflect")
 		builder.AddLine()
 		parentStructName := utils.FixStructName(typeScheme.GetName())
 		builder.AddImport("", "encoding/json")
@@ -134,6 +139,12 @@ func BuildMarshaller[Scheme interfaces.SchemeInterface](typeScheme Scheme, build
 			nil,
 			"([]byte, error)",
 		)
+		for _, nullableType := range nullableTypes {
+			varName := fmt.Sprintf("entity.%s", utils.PrettifyField(nullableType))
+			builder.AddIf(fmt.Sprintf("reflect.DeepEqual(%s, nil)", varName))
+			builder.SetVarValue(varName, "nil")
+			builder.CloseBracket()
+		}
 		BuildCheck(builder, isMethod, sendChildTypes)
 		builder.AddType("x0", parentStructName).AddLine()
 		builder.AddReturn("json.Marshal((x0)(entity))").AddLine()
