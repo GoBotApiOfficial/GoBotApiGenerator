@@ -129,7 +129,6 @@ func BuildMarshaller[Scheme interfaces.SchemeInterface](typeScheme Scheme, build
 		builder.AddReturn("json.Marshal(alias)").AddLine()
 		builder.CloseBracket()
 	} else if len(sendChildTypes) > 0 || len(nullableTypes) > 0 && typeScheme.IsSendMethod() && isMethod {
-		builder.AddImport("", "reflect")
 		builder.AddLine()
 		parentStructName := utils.FixStructName(typeScheme.GetName())
 		builder.AddImport("", "encoding/json")
@@ -140,6 +139,7 @@ func BuildMarshaller[Scheme interfaces.SchemeInterface](typeScheme Scheme, build
 			"([]byte, error)",
 		)
 		for _, nullableType := range nullableTypes {
+			builder.AddImport("", "reflect")
 			varName := fmt.Sprintf("entity.%s", utils.PrettifyField(nullableType))
 			builder.AddIf(fmt.Sprintf("reflect.DeepEqual(%s, nil)", varName))
 			builder.SetVarValue(varName, "nil")

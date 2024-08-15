@@ -23,6 +23,7 @@ func BuildCheck(builder *component.Context, isMethod bool, sendChildTypes map[st
 		originalEntityName := entityName
 		isChatIDWithUsername := fieldTypes.Name == "chat_id" && slices.Contains(fieldTypes.Types, "Integer") && slices.Contains(fieldTypes.Types, "String")
 		if fieldTypes.Optional || isChatIDWithUsername {
+			builder.AddImport("", "reflect")
 			builder.AddIf(fmt.Sprintf("!reflect.DeepEqual(%s, nil)", entityName))
 			if !strings.Contains(genericNameTmp, "any") && len(fieldTypes.FullTypes) == 0 {
 				entityName = fmt.Sprintf("(*%s)", entityName)
