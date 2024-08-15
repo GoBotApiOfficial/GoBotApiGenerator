@@ -138,11 +138,30 @@ func BuildMarshaller[Scheme interfaces.SchemeInterface](typeScheme Scheme, build
 			nil,
 			"([]byte, error)",
 		)
+
+		builder.InitVarValue("nilCheck", "func(val any) bool {").AddLine()
+		builder.AddIf("val == nil")
+		builder.AddReturn("true").AddLine()
+		builder.AddImport("", "reflect")
+		builder.CloseBracket()
+		builder.InitVarValue("v", "reflect.ValueOf(val)").AddLine()
+		builder.InitVarValue("k", "v.Kind()").AddLine()
+		builder.InitSwitch("k")
+		builder.AddCase(false, []string{
+			"reflect.Chan", "reflect.Func", "reflect.Map", "reflect.Pointer",
+			"reflect.UnsafePointer", "reflect.Interface", "reflect.Slice",
+		})
+		builder.AddReturn("v.IsNil()").AddLine()
+		builder.AddDefault()
+		builder.AddReturn("false").AddLine()
+		builder.CloseCase()
+		builder.CloseBracket()
+		builder.CloseBracket()
+		builder.SetVarValue("_", "nilCheck").AddLine()
 		for _, nullableType := range nullableTypes {
-			builder.AddImport("", "reflect")
-			varName := fmt.Sprintf("entity.%s", utils.PrettifyField(nullableType))
-			builder.AddIf(fmt.Sprintf("reflect.ValueOf(%s).IsNil()", varName))
-			builder.SetVarValue(varName, "nil")
+			entityName := fmt.Sprintf("entity.%s", utils.PrettifyField(nullableType))
+			builder.AddIf(fmt.Sprintf("nilCheck(%s)", entityName))
+			builder.SetVarValue(entityName, "nil")
 			builder.CloseBracket()
 		}
 		BuildCheck(builder, isMethod, sendChildTypes)
