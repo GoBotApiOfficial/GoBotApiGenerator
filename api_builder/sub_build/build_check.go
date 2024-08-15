@@ -11,7 +11,6 @@ import (
 )
 
 func BuildCheck(builder *component.Context, isMethod bool, sendChildTypes map[string]types.FieldTL) {
-	builder.AddImport("", "fmt")
 	for fieldName, fieldTypes := range sendChildTypes {
 		genericNameTmp := utils.FixGeneric(false, fieldTypes.Name, fieldTypes.Types, false, false)
 		arrayCounts := strings.Count(genericNameTmp, "[]")
@@ -56,6 +55,7 @@ func BuildCheck(builder *component.Context, isMethod bool, sendChildTypes map[st
 		builder.AddCase(false, fixedCases)
 		builder.AddBreak().CloseCase()
 		builder.AddDefault()
+		builder.AddImport("", "fmt")
 		builder.AddReturn(fmt.Sprintf("nil, fmt.Errorf(\"%s: unknown type: %%T\", %s)", fieldName, originalEntityName))
 		builder.CloseCase().AddLine()
 		for i := 0; i < arrayCounts; i++ {
