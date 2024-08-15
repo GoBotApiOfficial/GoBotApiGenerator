@@ -141,7 +141,7 @@ func BuildMarshaller[Scheme interfaces.SchemeInterface](typeScheme Scheme, build
 		for _, nullableType := range nullableTypes {
 			builder.AddImport("", "reflect")
 			varName := fmt.Sprintf("entity.%s", utils.PrettifyField(nullableType))
-			builder.AddIf(fmt.Sprintf("reflect.DeepEqual(%s, nil)", varName))
+			builder.AddIf(fmt.Sprintf("reflect.ValueOf(%s).IsNil()", varName))
 			builder.SetVarValue(varName, "nil")
 			builder.CloseBracket()
 		}
