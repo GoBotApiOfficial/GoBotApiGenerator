@@ -1,6 +1,8 @@
 module BotApiCompiler
 
-go 1.18
+go 1.23.0
+
+toolchain go1.23.3
 
 require (
 	github.com/anaskhan96/soup v1.2.5
