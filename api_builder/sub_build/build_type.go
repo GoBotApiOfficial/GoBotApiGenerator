@@ -74,14 +74,13 @@ func BuildType[Scheme interfaces.SchemeInterface](typeScheme Scheme, builder *co
 			}
 			if field.Types[0] == "InputFile" {
 				filesInput = append(filesInput, field)
-			} else if field.Name == "media" {
+			} else if field.Name == "media" || field.Name == "thumbnail" {
 				if genericName == "string" {
 					field = types.FieldTL{
 						Name: field.Name,
 						Types: []string{
 							"InputFile",
 						},
-						Optional: field.Optional,
 					}
 					goto CheckGeneric
 				}

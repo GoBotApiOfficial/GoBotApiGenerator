@@ -92,7 +92,7 @@ func BuildMarshaller[Scheme interfaces.SchemeInterface](typeScheme Scheme, build
 			if field.Optional || field.Types[0] == "InputFile" {
 				jsonName += ",omitempty"
 			}
-			if field.Name == "media" && genericName == "string" {
+			if (field.Name == "media" || field.Name == "thumbnail") && genericName == "string" {
 				field = types.FieldTL{
 					Name: field.Name,
 					Types: []string{
