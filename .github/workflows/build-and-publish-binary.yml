@@ -46,7 +46,7 @@ jobs:
           file_glob: true
 
   update-build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - name: Get Branch Name
         run: echo "::set-output name=branch::${GITHUB_REF#refs/heads/}"
