@@ -17,7 +17,7 @@ env:
   GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 jobs:
   release-build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - name: Get Branch Name
         run: echo "::set-output name=branch::${GITHUB_REF#refs/heads/}"
