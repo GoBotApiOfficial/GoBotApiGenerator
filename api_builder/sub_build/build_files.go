@@ -107,18 +107,26 @@ func BuildFiles[Scheme interfaces.SchemeInterface](typeScheme Scheme, builder *c
 		builder.AddReturn("files").AddLine()
 		builder.CloseBracket()
 		if isMediaInput {
-			builder.AddImport("", "fmt")
-			builder.AddLine()
-			builder.AddFunc("entity "+structName, "SetAttachment", []string{"attach string"}, "")
-			builder.SetVarValue("entity.Media", "InputURL(fmt.Sprintf(\"attach://%s\", attach))").AddLine()
-			builder.CloseBracket().AddLine()
-			var foundThumb bool
+			var foundMedia, foundThumb bool
 			for _, field := range typeScheme.GetFields() {
+				if field.Name == "media" {
+					foundMedia = true
+				}
 				if field.Name == "thumbnail" {
 					foundThumb = true
-					break
 				}
 			}
+			if foundMedia || foundThumb {
+				builder.AddImport("", "fmt")
+			}
+			builder.AddLine()
+			if foundMedia {
+				builder.AddFunc("entity "+structName, "SetAttachment", []string{"attach string"}, "")
+				builder.SetVarValue("entity.Media", "InputURL(fmt.Sprintf(\"attach://%s\", attach))").AddLine()
+			} else {
+				builder.AddFunc("entity "+structName, "SetAttachment", []string{"_ string"}, "")
+			}
+			builder.CloseBracket().AddLine()
 			if foundThumb {
 				builder.AddFunc("entity "+structName, "SetAttachmentThumb", []string{"attach string"}, "")
 				builder.SetVarValue("entity.Thumbnail", "InputURL(fmt.Sprintf(\"attach://%s\", attach))").AddLine()
