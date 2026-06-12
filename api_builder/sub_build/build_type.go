@@ -86,6 +86,9 @@ func BuildType[Scheme interfaces.SchemeInterface](typeScheme Scheme, builder *co
 				}
 				filesInput = append(filesInput, field)
 			}
+			if genericName == structName {
+				genericName = "*" + genericName
+			}
 			builder.AddField(
 				field.Name,
 				genericName,

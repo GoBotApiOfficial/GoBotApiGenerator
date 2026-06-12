@@ -36,15 +36,19 @@ func BuildSubtype[Scheme interfaces.SchemeInterface](typeScheme Scheme, builder 
 	builder.InitStruct(typeScheme.GetName())
 	for _, field := range commonTypesOrdered {
 		jsonName := field.Field.Name
+		genericName := utils.FixGeneric(
+			field.Field.Optional,
+			field.Field.Name,
+			field.Field.Types,
+			isMethod,
+			true,
+		)
+		if genericName == typeScheme.GetName() {
+			genericName = "*" + genericName
+		}
 		builder.AddField(
 			field.Field.Name,
-			utils.FixGeneric(
-				field.Field.Optional,
-				field.Field.Name,
-				field.Field.Types,
-				isMethod,
-				true,
-			),
+			genericName,
 			jsonName,
 		)
 	}
