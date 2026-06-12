@@ -15,7 +15,13 @@ func (ctx *Context) BuildConstants() []string {
 	builder := component.NewBuilder()
 	builder.SetPackage("types")
 	var existingConstants []string
-	for _, typeScheme := range ctx.ApiTL.Types {
+	typeNames := make([]string, 0, len(ctx.ApiTL.Types))
+	for name := range ctx.ApiTL.Types {
+		typeNames = append(typeNames, name)
+	}
+	sort.Strings(typeNames)
+	for _, name := range typeNames {
+		typeScheme := ctx.ApiTL.Types[name]
 		if len(typeScheme.GetSubTypes()) > 0 && !typeScheme.IsSendMethod() {
 			builder.AddComment(strings.ToUpper(utils.FixName(typeScheme.GetName())))
 			builder.InitConst()

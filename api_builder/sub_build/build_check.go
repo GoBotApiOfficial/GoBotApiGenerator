@@ -7,11 +7,18 @@ import (
 	"BotApiCompiler/consts"
 	"fmt"
 	"golang.org/x/exp/slices"
+	"sort"
 	"strings"
 )
 
 func BuildCheck(builder *component.Context, isMethod bool, sendChildTypes map[string]types.FieldTL) {
-	for fieldName, fieldTypes := range sendChildTypes {
+	fieldNames := make([]string, 0, len(sendChildTypes))
+	for fieldName := range sendChildTypes {
+		fieldNames = append(fieldNames, fieldName)
+	}
+	sort.Strings(fieldNames)
+	for _, fieldName := range fieldNames {
+		fieldTypes := sendChildTypes[fieldName]
 		genericNameTmp := utils.FixGeneric(false, fieldTypes.Name, fieldTypes.Types, false, false)
 		arrayCounts := strings.Count(genericNameTmp, "[]")
 		entityName := fmt.Sprintf("entity.%s", utils.PrettifyField(fieldName))
