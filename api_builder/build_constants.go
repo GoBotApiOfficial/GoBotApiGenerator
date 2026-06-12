@@ -26,7 +26,11 @@ func (ctx *Context) BuildConstants() []string {
 			builder.AddComment(strings.ToUpper(utils.FixName(typeScheme.GetName())))
 			builder.InitConst()
 			addedNum := 0
-			for _, field := range typeScheme.GetSubTypes() {
+			constNames := append([]string{}, typeScheme.GetSubTypes()...)
+			if utils.IsPolymorphicValue(typeScheme.GetName(), typeScheme.GetDescription()) {
+				constNames = append(constNames, typeScheme.GetName()+"Plain", typeScheme.GetName()+"Array")
+			}
+			for _, field := range constNames {
 				if !slices.Contains(existingConstants, field) {
 					existingConstants = append(existingConstants, field)
 					if addedNum > 0 {

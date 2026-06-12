@@ -33,6 +33,8 @@ func BuildType[Scheme interfaces.SchemeInterface](typeScheme Scheme, builder *co
 			return typesOrdered[i].Name < typesOrdered[j].Name
 		})
 		builder.InitStruct(structName)
+		var aliasFields []AliasFieldTL
+		hasPolyFields := false
 		for _, field := range typesOrdered {
 			jsonName := field.Name
 			if field.Types[0] == "InputFile" || consts.GenericInputRgx.MatchString(field.Types[0]) {
@@ -48,6 +50,18 @@ func BuildType[Scheme interfaces.SchemeInterface](typeScheme Scheme, builder *co
 						Default:  field.Default,
 					}
 				}
+			}
+			parseFunc := ""
+			if baseTypeName := strings.TrimPrefix(field.Types[0], "Array of "); listElements[baseTypeName] != nil &&
+				utils.IsPolymorphicValue(listElements[baseTypeName].GetName(), listElements[baseTypeName].GetDescription()) {
+				field = types.FieldTL{
+					Name:     field.Name,
+					Types:    []string{strings.ReplaceAll(field.Types[0], baseTypeName, baseTypeName+"Value")},
+					Optional: field.Optional,
+					Default:  field.Default,
+				}
+				parseFunc = fmt.Sprintf("Parse%sValue", baseTypeName)
+				hasPolyFields = true
 			}
 		CheckGeneric:
 			isFieldRawImport := utils.IsRawField(field.Types)
@@ -86,9 +100,18 @@ func BuildType[Scheme interfaces.SchemeInterface](typeScheme Scheme, builder *co
 				}
 				filesInput = append(filesInput, field)
 			}
+			if len(parseFunc) > 0 {
+				genericName = strings.TrimPrefix(genericName, "*")
+			}
 			if genericName == structName {
 				genericName = "*" + genericName
 			}
+			aliasFields = append(aliasFields, AliasFieldTL{
+				Name:      field.Name,
+				Generic:   genericName,
+				JsonName:  jsonName,
+				ParseFunc: parseFunc,
+			})
 			builder.AddField(
 				field.Name,
 				genericName,
@@ -100,6 +123,9 @@ func BuildType[Scheme interfaces.SchemeInterface](typeScheme Scheme, builder *co
 			builder.AddField("Progress", "rawTypes.ProgressCallable", "-")
 		}
 		builder.CloseBracket()
+		if hasPolyFields && !isMethod {
+			BuildPolyUnmarshal(builder, structName, aliasFields)
+		}
 	}
 	return filesInput
 }
