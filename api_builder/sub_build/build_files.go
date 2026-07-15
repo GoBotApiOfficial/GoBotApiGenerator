@@ -17,7 +17,7 @@ func BuildFiles[Scheme interfaces.SchemeInterface](typeScheme Scheme, builder *c
 	mediaFieldRgx := regexp.MustCompile("^\\[].*\\.Input.*Media$")
 	structName := utils.FixStructName(typeScheme.GetName())
 	structName = "*" + structName
-	if consts.GenericInputRgx.MatchString(typeScheme.GetName()) {
+	if len(typeScheme.GetFields()) == 0 && consts.GenericInputRgx.MatchString(typeScheme.GetName()) {
 		builder.InitInterface(typeScheme.GetName())
 		builder.AddInterfaceFunc("SetAttachment", []string{"string"}, "")
 		builder.AddInterfaceFunc("SetAttachmentThumb", []string{"string"}, "")
