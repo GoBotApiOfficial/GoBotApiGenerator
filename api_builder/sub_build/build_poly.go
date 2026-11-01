@@ -94,3 +94,27 @@ func BuildPolyUnmarshal(builder *component.Context, structName string, fields []
 	builder.AddReturn("nil").AddLine()
 	builder.CloseBracket()
 }
+
+func BuildObjectOrPolyParser(builder *component.Context, funcName, objectName, polyName, wrapField string) {
+	builder.AddImport("", "encoding/json")
+	builder.AddImport("", "bytes")
+	builder.AddLine().AddLine()
+	builder.AddFunc("", funcName, []string{"data []byte"}, fmt.Sprintf("(*%s, error)", objectName))
+	builder.SetVarValue("data", "bytes.TrimSpace(data)").AddLine()
+	builder.AddIf("len(data) == 0 || string(data) == \"null\"")
+	builder.AddReturn("nil, nil").AddLine()
+	builder.CloseBracket()
+	builder.AddIf("data[0] == '{'")
+	builder.DeclareVar("item", objectName).AddLine()
+	builder.AddIf("err := json.Unmarshal(data, &item); err != nil")
+	builder.AddReturn("nil, err").AddLine()
+	builder.CloseBracket()
+	builder.AddReturn("&item, nil").AddLine()
+	builder.CloseBracket()
+	builder.InitVarValue("value, err", fmt.Sprintf("Parse%sValue(data)", polyName)).AddLine()
+	builder.AddIf("err != nil")
+	builder.AddReturn("nil, err").AddLine()
+	builder.CloseBracket()
+	builder.AddReturn(fmt.Sprintf("&%s{%s: value}, nil", objectName, utils.PrettifyField(wrapField))).AddLine()
+	builder.CloseBracket()
+}
