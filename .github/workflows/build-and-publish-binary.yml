@@ -62,6 +62,7 @@ jobs:
         run: |
           go mod tidy
           go run .
+          cd gobotapi && go mod tidy
       - name: Checkout Project
         env:
           PToken: ${{ secrets.PToken }}
